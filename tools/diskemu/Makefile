@@ -19,7 +19,7 @@ endif
 # #############################################
 
 RESCOMP = windres
-INCLUDES +=
+INCLUDES += -Isrc
 FORCE_INCLUDE +=
 ALL_CPPFLAGS += $(CPPFLAGS) -MD -MP $(DEFINES) $(INCLUDES)
 ALL_CFLAGS += $(CFLAGS) $(ALL_CPPFLAGS) -m64
@@ -61,8 +61,12 @@ GENERATED :=
 OBJECTS :=
 
 GENERATED += $(OBJDIR)/disk.o
+GENERATED += $(OBJDIR)/fat12.o
+GENERATED += $(OBJDIR)/filesystem.o
 GENERATED += $(OBJDIR)/main.o
 OBJECTS += $(OBJDIR)/disk.o
+OBJECTS += $(OBJDIR)/fat12.o
+OBJECTS += $(OBJDIR)/filesystem.o
 OBJECTS += $(OBJDIR)/main.o
 
 # Rules
@@ -127,6 +131,12 @@ endif
 # File Rules
 # #############################################
 
+$(OBJDIR)/fat12.o: src/fs/fat12.cpp
+	@echo "$(notdir $<)"
+	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
+$(OBJDIR)/filesystem.o: src/fs/filesystem.cpp
+	@echo "$(notdir $<)"
+	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 $(OBJDIR)/main.o: src/main.cpp
 	@echo "$(notdir $<)"
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"

@@ -3,6 +3,10 @@ project "DiskEMU"
 	language "C++"
 	cppdialect "c++20"
 
+	includedirs
+	{
+		"%{prj.location}/src",
+	}
 	
 	files
 	{
