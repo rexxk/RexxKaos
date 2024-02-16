@@ -1,2 +1,2 @@
-vendor/premake/premake5 gmake2
-
+vendor/premake/linux/premake5 gmake2
+make -j4

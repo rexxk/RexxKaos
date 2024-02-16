@@ -1,12 +1,13 @@
 project "DiskEMU"
 	kind "ConsoleApp"
 	language "C++"
-	
+	cppdialect "c++20"
+
 	
 	files
 	{
-		"**.h",
-		"**.cpp",
+		"src/**.h",
+		"src/**.cpp",
 	}
 	
 
