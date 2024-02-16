@@ -12,5 +12,8 @@ public:
     virtual void CreateFilesystem() override;
 
 private:
+    void CalculateFATData();
+
+private:
     std::shared_ptr<DiskMedia> m_DiskMedia;
 };
