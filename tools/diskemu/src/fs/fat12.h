@@ -8,6 +8,8 @@ class Fat12 : public Filesystem
 public:
     Fat12(std::shared_ptr<DiskMedia> diskMedia);
 
+    virtual void AddFile(const std::string& filename) override;
+    virtual void RemoveFile(const std::string& filename) override;
 
     virtual void CreateFilesystem() override;
     virtual void StoreToImage() override;

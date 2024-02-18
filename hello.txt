@@ -1,0 +1,4 @@
+This is a text file written to test file creation in DiskTools.
+
+Hello world! Or... Whatever world.
+

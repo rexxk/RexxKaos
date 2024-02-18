@@ -1,6 +1,7 @@
 #include "fat12.h"
 
 #include <iostream>
+#include <fstream>
 #include <cstring>
 
 #include <vector>
@@ -282,5 +283,30 @@ void Fat12::StoreToImage()
     {
         m_DiskMedia->WriteToSector(s_FAT12Data.RootDirectoryLocation + i, (const char*)(s_FAT12Data.DirectoryEntries.data() + i * s_BPBData.BytesPerSector / sizeof(FAT12DirectoryEntry)), s_BPBData.BytesPerSector);
     }
+
+}
+
+
+void Fat12::AddFile(const std::string& filename)
+{
+    std::ifstream fs(filename, std::ios::in | std::ios::binary);
+
+    if (!fs.is_open())
+    {
+        std::cout << "Failed to open " << filename << "\n";
+        return;
+    }
+
+    fs.seekg(0, fs.end);
+    uint32_t fileSize = (uint32_t)fs.tellg();
+    fs.seekg(0, fs.beg);
+
+    std::cout << "Adding " << filename << " to disk (" << fileSize << " bytes)\n";
+
+    fs.close();
+}
+
+void Fat12::RemoveFile(const std::string& filename)
+{
 
 }
