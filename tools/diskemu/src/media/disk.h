@@ -43,6 +43,7 @@ public:
     std::vector<uint8_t>& ReadSector(uint32_t sector, uint32_t cylinder, uint32_t head);
 
     void WriteToSector(uint32_t sector, const char* data, uint32_t length, uint32_t offset = 0);
+    void FormatSector(uint32_t sector);
 
     void SaveImage(const std::string& filename);
 

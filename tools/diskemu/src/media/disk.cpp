@@ -101,6 +101,10 @@ void DiskMedia::SaveImage(const std::string& filename)
 void DiskMedia::WriteToSector(uint32_t sector, const char* data, uint32_t length, uint32_t offset)
 {
     std::vector<uint8_t>& sectorData = s_SectorData[sector];
-
     std::memcpy(sectorData.data() + offset, data, length);
+}
+
+void DiskMedia::FormatSector(uint32_t sector)
+{
+    std::memset(s_SectorData[sector].data(), 0, s_SectorData[sector].size());
 }

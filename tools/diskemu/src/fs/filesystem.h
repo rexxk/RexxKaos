@@ -20,5 +20,5 @@ public:
     virtual ~Filesystem() = default;
 
     virtual void CreateFilesystem() = 0;
-
+    virtual void StoreToImage() = 0;
 };
