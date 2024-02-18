@@ -188,15 +188,19 @@ void Fat12::CalculateFATData()
     std::cout << "FAT entry 0: " << std::hex << GetFATEntry(0) << std::dec << "\n";
     std::cout << "FAT entry 1: " << std::hex << GetFATEntry(1) << std::dec << "\n";
 
-    ClearDirectory(s_FAT12Data.RootDirectoryLocation);
     s_FAT12Data.DirectoryEntries.resize(s_BPBData.MaxRootDirectoryEntries);
+    std::cout << "Directory size: " << s_FAT12Data.DirectoryEntries.size() * sizeof(FAT12DirectoryEntry) << "\n";
+    ClearDirectory(s_FAT12Data.RootDirectoryLocation);
 
     std::cout << "First free entry: " << FindFirstFreeFATEntry() << "\n";
 }
 
 void Fat12::ClearDirectory(uint32_t sector)
 {
-    m_DiskMedia->FormatSector(sector);
+    for (uint32_t i = 0; i < s_BPBData.MaxRootDirectoryEntries; i++)
+    {
+        s_FAT12Data.DirectoryEntries.at(i) = { 0 };
+    }
 }
 
 void Fat12::SetFATEntry(uint32_t fatEntry, uint16_t value)
@@ -276,10 +280,7 @@ void Fat12::StoreToImage()
 
     for (uint32_t i = 0; i < rootDirectorySectors; i++)
     {
-        std::cout << "Writing sector " << i << ": " << s_FAT12Data.RootDirectoryLocation + i << ", ";
-
-        m_DiskMedia->WriteToSector(s_FAT12Data.RootDirectoryLocation + i, (const char*)(s_FAT12Data.DirectoryEntries.data() + i * s_BPBData.BytesPerSector), s_BPBData.BytesPerSector);
-        std::cout << "data: " << s_FAT12Data.DirectoryEntries.data() + i * s_BPBData.BytesPerSector << "\n";
+        m_DiskMedia->WriteToSector(s_FAT12Data.RootDirectoryLocation + i, (const char*)(s_FAT12Data.DirectoryEntries.data() + i * s_BPBData.BytesPerSector / sizeof(FAT12DirectoryEntry)), s_BPBData.BytesPerSector);
     }
-    
+
 }
