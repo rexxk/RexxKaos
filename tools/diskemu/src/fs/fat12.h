@@ -22,6 +22,7 @@ private:
     uint16_t GetFATEntry(uint32_t fatEntry);
 
     uint32_t FindFirstFreeFATEntry();
+    uint32_t FindRootDirectoryEntry();
 
 private:
     std::shared_ptr<DiskMedia> m_DiskMedia;

@@ -4,6 +4,8 @@
 #include <fstream>
 #include <cstring>
 
+#include <filesystem>
+
 #include <vector>
 
 
@@ -96,6 +98,22 @@ struct FAT12Data
 };
 
 static FAT12Data s_FAT12Data;
+
+
+void PrintDirectoryEntry(uint32_t entry)
+{
+    FAT12DirectoryEntry& directoryEntry = s_FAT12Data.DirectoryEntries.at(entry);
+
+    for (uint32_t i = 0; i < 8; i++)
+        std::cout << directoryEntry.Filename[i];
+
+    std::cout << ".";
+
+    for (uint32_t i = 0; i < 3; i++)
+        std::cout << directoryEntry.Filename[i + 8];
+
+    std::cout << "  " << directoryEntry.FileSize << " bytes\n";
+}
 
 
 Fat12::Fat12(std::shared_ptr<DiskMedia> diskMedia)
@@ -289,7 +307,21 @@ void Fat12::StoreToImage()
 
 void Fat12::AddFile(const std::string& filename)
 {
+    std::string file;
+    std::string extension;
+
     std::ifstream fs(filename, std::ios::in | std::ios::binary);
+
+    auto extensionStart = filename.find_last_of('.');
+    auto filenameStart = filename.find_last_of("/\\");
+
+    if (extensionStart != std::string::npos)
+        extension = filename.substr(extensionStart + 1);
+
+    if (filenameStart != std::string::npos)
+        file = filename.substr(filenameStart);
+    else
+        file = filename.substr(0, extensionStart);
 
     if (!fs.is_open())
     {
@@ -303,10 +335,54 @@ void Fat12::AddFile(const std::string& filename)
 
     std::cout << "Adding " << filename << " to disk (" << fileSize << " bytes)\n";
 
+    std::vector<uint8_t> data;
+    data.resize(fileSize);
+
+    fs.read((char*)data.data(), fileSize);
+
     fs.close();
+
+    uint32_t neededSectors = (fileSize / s_BPBData.BytesPerSector) + 1;
+    uint32_t directoryEntry = FindRootDirectoryEntry();
+
+    FAT12DirectoryEntry& entry = s_FAT12Data.DirectoryEntries[directoryEntry];
+
+    std::memcpy((char*)&entry.Filename, file.c_str(), (uint32_t)file.size() > 8 ? 8 : (uint32_t)file.size());
+    std::cout << "Writing extension: " << extension << "\n";
+
+    if (extension.size() > 3)
+        extension = extension.substr(1, 3);
+
+    std::memcpy((char*)&entry.Filename + 8, extension.c_str(), extension.size());
+    entry.FileSize = fileSize;
+    entry.Attributes = (uint32_t)FAT12DirectoryFlag::Archive;
+
+    std::cout << "Needed sectors on disk: " << neededSectors << "\n";
+
+    PrintDirectoryEntry(directoryEntry);
+
+    std::cout << "Data: " << data.data() << "\n";
+
+    // Add data...
+    entry.FirstCluster = FindFirstFreeFATEntry();
+
+    std::cout << "First cluster: " << entry.FirstCluster << "\n";
+
+    s_FAT12Data.FATTable[entry.FirstCluster] = 0xFFF;
 }
 
 void Fat12::RemoveFile(const std::string& filename)
 {
 
+}
+
+uint32_t Fat12::FindRootDirectoryEntry()
+{
+    for (uint32_t i = 0; i < (uint32_t)s_FAT12Data.DirectoryEntries.size(); i++)
+    {
+        if (s_FAT12Data.DirectoryEntries[i].Filename[0] == 0)
+            return i;
+    }
+
+    return -1;
 }
