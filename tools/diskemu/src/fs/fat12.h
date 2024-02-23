@@ -14,9 +14,13 @@ public:
     virtual void CreateFilesystem() override;
     virtual void StoreToImage() override;
 
+    virtual void PrintDirectory() override;
+
 private:
     void CalculateFATData();
     void ClearDirectory(uint32_t sector);
+
+    void WriteRootDirectory();
 
     void SetFATEntry(uint32_t fatEntry, uint16_t value);
     uint16_t GetFATEntry(uint32_t fatEntry);

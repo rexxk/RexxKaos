@@ -25,4 +25,6 @@ public:
 
     virtual void CreateFilesystem() = 0;
     virtual void StoreToImage() = 0;
+
+    virtual void PrintDirectory() = 0;
 };

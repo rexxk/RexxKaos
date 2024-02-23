@@ -30,4 +30,6 @@ int main()
 	fat12->AddFile("hello.txt");
 
 	dm->SaveImage("test.img");
+
+	fat12->PrintDirectory();
 }
