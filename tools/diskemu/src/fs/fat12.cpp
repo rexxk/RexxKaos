@@ -172,11 +172,11 @@ void Fat12::CreateFilesystem()
 
     std::cout << "Size of boot parameter block: " << sizeof(s_BPBData) << " bytes\n";
 
-    m_DiskMedia->WriteToSector(0, (const char*)&s_BPBData, sizeof(s_BPBData), 3);
+//    m_DiskMedia->WriteToSector(0, (const char*)&s_BPBData, sizeof(s_BPBData), 3);
 
     CalculateFATData();
 
-    StoreToImage();
+//    StoreToImage();
 }
 
 void Fat12::CalculateFATData()
@@ -261,43 +261,43 @@ void Fat12::StoreToImage()
 
     std::vector<uint8_t> fatTable;
 
+    uint8_t lowValue = 0;
+    uint8_t midValue = 0;
+    uint8_t highValue = 0;
+
+    for (uint32_t i = 0; i < (uint32_t)s_FAT12Data.FATTable.size(); i++)
+    {
+        uint16_t value = s_FAT12Data.FATTable.at(i);
+
+        if (i & 1)
+        {
+            midValue += (uint8_t)((value & 0xF00) >> 8);
+            lowValue += (uint8_t)value & 0xFF;
+
+            fatTable.push_back(highValue);
+            fatTable.push_back(midValue);
+            fatTable.push_back(lowValue);
+
+            lowValue = 0;
+            midValue = 0;
+            highValue = 0;
+        }
+        else
+        {
+            highValue += (uint8_t)((value & 0xFF0) >> 4);
+            midValue += (uint8_t)((value & 0xF) << 4);
+        }
+    }
+
+    uint32_t fatSectors = ((uint32_t)fatTable.size() / s_BPBData.BytesPerSector) + 1;
+
     for (uint32_t fatLocation : s_FAT12Data.FATLocations)
     {
-
-        uint8_t lowValue = 0;
-        uint8_t midValue = 0;
-        uint8_t highValue = 0;
-
-        for (uint32_t i = 0; i < (uint32_t)s_FAT12Data.FATTable.size(); i++)
-        {
-            uint16_t value = s_FAT12Data.FATTable.at(i);
-
-            if (i & 1)
-            {
-                midValue += (uint8_t)((value & 0xF00) >> 8);
-                lowValue += (uint8_t)value & 0xFF;
-
-                fatTable.push_back(highValue);
-                fatTable.push_back(midValue);
-                fatTable.push_back(lowValue);
-
-                lowValue = 0;
-                midValue = 0;
-                highValue = 0;
-            }
-            else
-            {
-                highValue += (uint8_t)((value & 0xFF0) >> 4);
-                midValue += (uint8_t)((value & 0xF) << 4);
-            }
-        }
-
-        uint32_t fatSectors = ((uint32_t)fatTable.size() / s_BPBData.BytesPerSector) + 1;
-
         for (uint32_t i = 0; i < fatSectors; i++)
         {
             m_DiskMedia->WriteToSector(fatLocation + i, (const char*)fatTable.data() + i * s_BPBData.BytesPerSector, s_BPBData.BytesPerSector);
         }
+
     }
 
     WriteRootDirectory();
@@ -391,7 +391,7 @@ void Fat12::AddFile(const std::string& filename)
 
 //    WriteRootDirectory();
 
-    StoreToImage();
+//    StoreToImage();
 }
 
 void Fat12::RemoveFile(const std::string& filename)
