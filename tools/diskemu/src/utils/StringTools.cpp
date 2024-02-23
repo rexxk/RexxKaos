@@ -1,6 +1,7 @@
 #include "StringTools.h"
 
-
+#include <cstdint>
+#include <cstring>
 
 
 void GetFAT12Filename(const std::string& path, char* filename)

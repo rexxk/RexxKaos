@@ -172,11 +172,7 @@ void Fat12::CreateFilesystem()
 
     std::cout << "Size of boot parameter block: " << sizeof(s_BPBData) << " bytes\n";
 
-//    m_DiskMedia->WriteToSector(0, (const char*)&s_BPBData, sizeof(s_BPBData), 3);
-
     CalculateFATData();
-
-//    StoreToImage();
 }
 
 void Fat12::CalculateFATData()
@@ -192,7 +188,7 @@ void Fat12::CalculateFATData()
     }
 
     s_FAT12Data.RootDirectoryLocation = location;
-    s_FAT12Data.DataRegionStart = s_FAT12Data.RootDirectoryLocation + (s_BPBData.MaxRootDirectoryEntries * sizeof(FAT12DirectoryEntry)) / s_BPBData.BytesPerSector;
+    s_FAT12Data.DataRegionStart = s_FAT12Data.RootDirectoryLocation - 2 + (s_BPBData.MaxRootDirectoryEntries * sizeof(FAT12DirectoryEntry)) / s_BPBData.BytesPerSector;
 
     std::cout << "Root directory: " << location << "\n";
     std::cout << "Data region start: " << s_FAT12Data.DataRegionStart << "\n";
