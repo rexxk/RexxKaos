@@ -17,11 +17,15 @@ class Filesystem
 {
 public:
     static std::shared_ptr<Filesystem> Create(std::shared_ptr<DiskMedia> diskMedia, FilesystemType fsType);
-
+    static std::shared_ptr<Filesystem> Open(std::shared_ptr<DiskMedia> diskMedia);
     virtual ~Filesystem() = default;
+
+    virtual void ReadFilesystem(std::shared_ptr<DiskMedia> diskMedia) = 0;
 
     virtual void AddFile(const std::string& filename) = 0;
     virtual void RemoveFile(const std::string& filename) = 0;
+
+    virtual void SetLabel(const std::string& label) = 0;
 
     virtual void CreateFilesystem() = 0;
     virtual void StoreToImage() = 0;

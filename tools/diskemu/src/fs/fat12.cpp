@@ -109,7 +109,7 @@ void Fat12::PrintDirectory()
 
     for (FAT12DirectoryEntry& entry : s_FAT12Data.DirectoryEntries)
     {
-        if (entry.Filename[0] == 0)
+        if (entry.Filename[0] == 0 || (entry.Attributes & (uint32_t)FAT12DirectoryFlag::VolumeLabel))
             continue;
 
         for (uint32_t i = 0; i < 8; i++)
@@ -131,6 +131,10 @@ Fat12::Fat12(std::shared_ptr<DiskMedia> diskMedia)
     CreateFilesystem();
 }
 
+void Fat12::ReadFilesystem(std::shared_ptr<DiskMedia> diskMedia)
+{
+
+}
 
 void Fat12::CreateFilesystem()
 {
@@ -182,7 +186,7 @@ void Fat12::CalculateFATData()
     for (uint32_t i = 0; i < s_BPBData.NumberOfFATs; i++)
     {
         s_FAT12Data.FATLocations.push_back(location);
-        std::cout << "FAT location: " << location << "\n";
+//        std::cout << "FAT location: " << location << "\n";
 
         location += s_BPBData.SectorsPerFAT;
     }
@@ -190,30 +194,30 @@ void Fat12::CalculateFATData()
     s_FAT12Data.RootDirectoryLocation = location;
     s_FAT12Data.DataRegionStart = (s_FAT12Data.RootDirectoryLocation - 2) + (s_BPBData.MaxRootDirectoryEntries * sizeof(FAT12DirectoryEntry)) / s_BPBData.BytesPerSector;
 
-    std::cout << "Root directory: " << location << "\n";
-    std::cout << "Data region start: " << s_FAT12Data.DataRegionStart << "\n";
+//    std::cout << "Root directory: " << location << "\n";
+//    std::cout << "Data region start: " << s_FAT12Data.DataRegionStart << "\n";
 
     if (s_BPBData.TotalSectors == 0)
         s_FAT12Data.TotalSectorCount = s_BPBData.TotalSectorsLarge;
     else
         s_FAT12Data.TotalSectorCount = s_BPBData.TotalSectors;
 
-    std::cout << "Total sector count: " << s_FAT12Data.TotalSectorCount << "\n";
+//    std::cout << "Total sector count: " << s_FAT12Data.TotalSectorCount << "\n";
 
     s_FAT12Data.FATEntries = (uint32_t)(s_BPBData.SectorsPerFAT * s_BPBData.BytesPerSector * 1.5);
 
-    std::cout << "FAT entries count: " << s_FAT12Data.FATEntries << "\n";
+//    std::cout << "FAT entries count: " << s_FAT12Data.FATEntries << "\n";
 
     s_FAT12Data.FATTable.resize(s_FAT12Data.FATEntries);
 
     SetFATEntry(0, (0xF << 8) + s_BPBData.MediaDescriptor);
     SetFATEntry(1, 0xFFF);
 
-    std::cout << "FAT entry 0: " << std::hex << GetFATEntry(0) << std::dec << "\n";
-    std::cout << "FAT entry 1: " << std::hex << GetFATEntry(1) << std::dec << "\n";
+//    std::cout << "FAT entry 0: " << std::hex << GetFATEntry(0) << std::dec << "\n";
+//    std::cout << "FAT entry 1: " << std::hex << GetFATEntry(1) << std::dec << "\n";
 
     s_FAT12Data.DirectoryEntries.resize(s_BPBData.MaxRootDirectoryEntries);
-    std::cout << "Directory size: " << s_FAT12Data.DirectoryEntries.size() * sizeof(FAT12DirectoryEntry) << "\n";
+//    std::cout << "Directory size: " << s_FAT12Data.DirectoryEntries.size() * sizeof(FAT12DirectoryEntry) << "\n";
     ClearDirectory(s_FAT12Data.RootDirectoryLocation);
 
 //    std::cout << "First free entry: " << FindFirstFreeFATEntry(0) << "\n";
@@ -307,8 +311,8 @@ void Fat12::WriteRootDirectory()
     // Write root directory
     uint32_t rootDirectorySectors = ((uint32_t)s_FAT12Data.DirectoryEntries.size() * sizeof(FAT12DirectoryEntry)) / s_BPBData.BytesPerSector;
 
-    std::cout << "Root directory sectors: " << rootDirectorySectors << "\n";
-    std::cout << "Byte align: " << (s_FAT12Data.DirectoryEntries.size() * sizeof(FAT12DirectoryEntry)) % s_BPBData.BytesPerSector << "\n";
+//    std::cout << "Root directory sectors: " << rootDirectorySectors << "\n";
+//    std::cout << "Byte align: " << (s_FAT12Data.DirectoryEntries.size() * sizeof(FAT12DirectoryEntry)) % s_BPBData.BytesPerSector << "\n";
 
     for (uint32_t i = 0; i < rootDirectorySectors; i++)
     {
@@ -319,9 +323,6 @@ void Fat12::WriteRootDirectory()
 
 void Fat12::AddFile(const std::string& filename)
 {
-    std::string file;
-    std::string extension;
-
     char filenameStr[11];
     GetFAT12Filename(filename, filenameStr);
 
@@ -337,7 +338,7 @@ void Fat12::AddFile(const std::string& filename)
     uint32_t fileSize = (uint32_t)fs.tellg();
     fs.seekg(0, fs.beg);
 
-    std::cout << "Adding " << filename << " to disk (" << fileSize << " bytes)\n";
+//    std::cout << "Adding " << filename << " to disk (" << fileSize << " bytes)\n";
 
     std::vector<uint8_t> data;
     data.resize(fileSize);
@@ -348,7 +349,7 @@ void Fat12::AddFile(const std::string& filename)
 
     uint32_t neededSectors = (fileSize / s_BPBData.BytesPerSector) + 1;
 
-    std::cout << "Needed sectors on disk: " << neededSectors << "\n";
+//    std::cout << "Needed sectors on disk: " << neededSectors << "\n";
 
     // Write directory entry
     uint32_t directoryEntry = FindRootDirectoryEntry();
@@ -358,7 +359,7 @@ void Fat12::AddFile(const std::string& filename)
     entry.Attributes = (uint32_t)FAT12DirectoryFlag::Archive;
     entry.FirstCluster = FindFirstFreeFATEntry(2);
 
-    std::cout << "First cluster: " << entry.FirstCluster << "\n";
+//    std::cout << "First cluster: " << entry.FirstCluster << "\n";
     // Add data...
 //    std::cout << "Data: " << data.data() << "\n";
 
@@ -372,7 +373,7 @@ void Fat12::AddFile(const std::string& filename)
     {
         // Write data to data sector
 
-        std::cout << "FAT address: " << nextCluster << "\n";
+//        std::cout << "FAT address: " << nextCluster << "\n";
 
         m_DiskMedia->WriteToSector(s_FAT12Data.DataRegionStart + nextCluster, (const char*)data.data() + (dataIndex++ * s_BPBData.BytesPerSector), 
             dataRemaining > s_BPBData.BytesPerSector ? s_BPBData.BytesPerSector : dataRemaining);
@@ -391,6 +392,20 @@ void Fat12::AddFile(const std::string& filename)
         }
     }
 
+}
+
+void Fat12::SetLabel(const std::string& label)
+{
+    char filenameStr[11];
+    GetFAT12Filename(label, filenameStr);
+
+    uint32_t directoryEntry = FindRootDirectoryEntry();
+    FAT12DirectoryEntry& entry = s_FAT12Data.DirectoryEntries[directoryEntry];
+    std::memcpy(entry.Filename, filenameStr, 11);
+    entry.Attributes = (uint32_t)FAT12DirectoryFlag::VolumeLabel;
+    entry.FirstCluster = 0;
+
+//    std::memcpy(s_BPBData.VolumeLabel, filenameStr, 11);
 }
 
 void Fat12::RemoveFile(const std::string& filename)

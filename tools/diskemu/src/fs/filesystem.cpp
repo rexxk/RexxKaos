@@ -15,3 +15,8 @@ std::shared_ptr<Filesystem> Filesystem::Create(std::shared_ptr<DiskMedia> diskMe
 
     return nullptr;
 }
+
+std::shared_ptr<Filesystem> Filesystem::Open(std::shared_ptr<DiskMedia> diskMedia)
+{
+
+}
