@@ -16,6 +16,8 @@ void GetFAT12Filename(const std::string& path, char* filename)
 
     if (filenameStart == std::string::npos)
         filenameStart = 0;
+    else
+        filenameStart++;
 
     size_t fileLength = 0;
 

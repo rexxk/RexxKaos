@@ -25,7 +25,7 @@ private:
     void SetFATEntry(uint32_t fatEntry, uint16_t value);
     uint16_t GetFATEntry(uint32_t fatEntry);
 
-    uint32_t FindFirstFreeFATEntry();
+    uint32_t FindFirstFreeFATEntry(uint32_t offset);
     uint32_t FindRootDirectoryEntry();
 
 private:

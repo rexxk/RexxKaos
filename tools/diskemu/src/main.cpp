@@ -27,7 +27,8 @@ int main()
 
 	std::shared_ptr<Filesystem> fat12 = Filesystem::Create(dm, FilesystemType::FAT12);
 
-	fat12->AddFile("hello.txt");
+//	fat12->AddFile("hello.txt");
+	fat12->AddFile("Tools/DiskEMU/Makefile");
 	fat12->StoreToImage();
 
 	dm->SaveImage("test.img");
