@@ -7,7 +7,8 @@
     [
         "hello.txt",
         "LICENSE",
-        "Makefile"        
+        "Makefile",
+        "build.sh"        
     ]
 
 }

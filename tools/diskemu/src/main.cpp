@@ -14,6 +14,27 @@ struct CommandLineOptions
 };
 
 
+struct AppData
+{
+	FilesystemType FSType = FilesystemType::FAT12;
+
+	std::string Bootloader = "";
+	std::string Label = "";
+
+	std::vector<std::string> FileList;
+};
+
+static AppData s_AppData;
+
+
+FilesystemType StringToFilesystemType(const std::string& str)
+{
+	if (str == "fat12") return FilesystemType::FAT12;
+	if (str == "fat16") return FilesystemType::FAT16;
+	if (str == "fat32") return FilesystemType::FAT32;
+
+	return FilesystemType::FAT12;
+}
 
 int main(int argc, char** argv)
 {
@@ -59,16 +80,21 @@ int main(int argc, char** argv)
 			if (attribute == "filesystem")
 			{
 				std::cout << "Filesystem: " << attributeIterator.second[0] << "\n";
+				s_AppData.FSType = StringToFilesystemType(attributeIterator.second[0]);
 			}
 
 			if (attribute == "boot" && attributeIterator.second[0] != "null")
 			{
 				std::cout << "Bootblock: " << attributeIterator.second[0] << "\n";
+
+				s_AppData.Bootloader = attributeIterator.second[0];
 			}
 
 			if (attribute == "label")
 			{
 				std::cout << "Label: " << attributeIterator.second[0] << "\n";
+
+				s_AppData.Label = attributeIterator.second[0];
 			}
 
 			if (attribute == "files")
@@ -78,6 +104,8 @@ int main(int argc, char** argv)
 				for (auto& file : attributeIterator.second)
 				{
 					std::cout << " " << file << "\n";
+
+					s_AppData.FileList.push_back(file);
 				}
 			}
 		}
@@ -99,15 +127,21 @@ int main(int argc, char** argv)
 
 	dm->ReadSector(5, 1, 1);
 
-	std::shared_ptr<Filesystem> fat12 = Filesystem::Create(dm, FilesystemType::FAT12);
+	std::shared_ptr<Filesystem> fs = Filesystem::Create(dm, s_AppData.FSType);
 
-	fat12->AddFile("hello.txt");
-	fat12->AddFile("Tools/DiskEMU/Makefile");
-	fat12->AddFile("LICENSE");
-	fat12->SetLabel("REXXOS");
-	fat12->StoreToImage();
+	for (auto& file : s_AppData.FileList)
+	{
+		fs->AddFile(file);
+	}
+
+//	fat12->AddFile("hello.txt");
+//	fat12->AddFile("Tools/DiskEMU/Makefile");
+//	fat12->AddFile("LICENSE");
+//	fat12->SetLabel("REXXOS");
+//	fat12->StoreToImage();
+	fs->StoreToImage();
 
 	dm->SaveImage("test.img");
 
-	fat12->PrintDirectory();
+	fs->PrintDirectory();
 }
