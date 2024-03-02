@@ -1,0 +1,11 @@
+{
+    "boot": null,
+    "label": "RexxOS",
+
+    "files":
+    [
+        "premake5.lua",
+        "Makefile"        
+    ]
+
+}

@@ -1,15 +1,56 @@
 #include "media/disk.h"
 #include "fs/filesystem.h"
 
+#include "json/jsonparser.h"
+
 #include <iostream>
 
 
 
-
-
-
-int main()
+struct CommandLineOptions
 {
+	bool JSONConfig = false;
+	std::string ConfigFilename;
+};
+
+
+
+int main(int argc, char** argv)
+{
+	CommandLineOptions options = {};
+
+	for (int i = 0; i < argc; i++)
+	{
+		if (argv[i][0] == '-')
+		{
+			char c = argv[i][1];
+
+			switch (c)
+			{
+				case 'c':
+				{
+					options.JSONConfig = true;
+				
+					if (++i < argc)
+						options.ConfigFilename = argv[i];
+				
+					break;
+				}
+
+				case 'v': case 'V':
+				{
+					std::cout << "DiskEMU version 1.0 by David Andersson 2024\n";
+					break;
+				}
+			}
+		}
+	}
+
+	if (options.JSONConfig == true)
+	{
+		JSONParser::ParseFile(options.ConfigFilename);
+	}
+
 //	DiskMedia::MediaDescriptor descriptor = {};
 //	descriptor.Cylinders = 80;
 //	descriptor.Heads = 2;
