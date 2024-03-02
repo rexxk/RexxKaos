@@ -52,16 +52,34 @@ int main(int argc, char** argv)
 
 		std::cout << "JSON import results:\n";
 			
-		for (auto& attribute : result.Attributes)
+		for (auto& attributeIterator : result.Attributes)
 		{
-			std::cout << " " << attribute.first << ": ";
+			std::string attribute = attributeIterator.first;
 
-			for (auto& value : attribute.second)
+			if (attribute == "filesystem")
 			{
-				std::cout << value << " ";
+				std::cout << "Filesystem: " << attributeIterator.second[0] << "\n";
 			}
 
-			std::cout << "\n";
+			if (attribute == "boot" && attributeIterator.second[0] != "null")
+			{
+				std::cout << "Bootblock: " << attributeIterator.second[0] << "\n";
+			}
+
+			if (attribute == "label")
+			{
+				std::cout << "Label: " << attributeIterator.second[0] << "\n";
+			}
+
+			if (attribute == "files")
+			{
+				std::cout << "Files\n";
+
+				for (auto& file : attributeIterator.second)
+				{
+					std::cout << " " << file << "\n";
+				}
+			}
 		}
 	}
 

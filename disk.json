@@ -1,10 +1,12 @@
 {
+    "filesystem": "fat12",
     "boot": null,
     "label": "RexxOS",
 
     "files":
     [
-        "premake5.lua",
+        "hello.txt",
+        "LICENSE",
         "Makefile"        
     ]
 
