@@ -48,8 +48,23 @@ int main(int argc, char** argv)
 
 	if (options.JSONConfig == true)
 	{
-		JSONParser::ParseFile(options.ConfigFilename);
+		JSONImportResult result = JSONParser::ParseFile(options.ConfigFilename);
+
+		std::cout << "JSON import results:\n";
+			
+		for (auto& attribute : result.Attributes)
+		{
+			std::cout << " " << attribute.first << ": ";
+
+			for (auto& value : attribute.second)
+			{
+				std::cout << value << " ";
+			}
+
+			std::cout << "\n";
+		}
 	}
+
 
 //	DiskMedia::MediaDescriptor descriptor = {};
 //	descriptor.Cylinders = 80;
