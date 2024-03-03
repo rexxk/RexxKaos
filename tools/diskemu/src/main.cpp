@@ -124,11 +124,6 @@ int main(int argc, char** argv)
 
 
 	std::shared_ptr<DiskMedia> dm = DiskMedia::Create(DiskMediaType::HD_1440);
-
-	dm->ReadSector(31);
-
-	dm->ReadSector(5, 1, 1);
-
 	std::shared_ptr<Filesystem> fs = Filesystem::Create(dm, s_AppData.FSType);
 
 	for (auto& file : s_AppData.FileList)
