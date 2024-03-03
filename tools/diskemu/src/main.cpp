@@ -58,6 +58,14 @@ int main(int argc, char** argv)
 					break;
 				}
 
+				case 'b':
+				{
+					if (++i < argc)
+						s_AppData.Bootloader = argv[i];
+
+					break;
+				}
+
 				case 'v': case 'V':
 				{
 					std::cout << "DiskEMU version 1.0 by David Andersson 2024\n";
@@ -87,6 +95,9 @@ int main(int argc, char** argv)
 			{
 				std::cout << "Bootblock: " << attributeIterator.second[0] << "\n";
 
+				if (!s_AppData.Bootloader.empty())
+					std::cout << "Overriding boot option, " << s_AppData.Bootloader << " is replaced by " << attributeIterator.second[0] << "\n";
+
 				s_AppData.Bootloader = attributeIterator.second[0];
 			}
 
@@ -112,15 +123,6 @@ int main(int argc, char** argv)
 	}
 
 
-//	DiskMedia::MediaDescriptor descriptor = {};
-//	descriptor.Cylinders = 80;
-//	descriptor.Heads = 2;
-//	descriptor.Sectors = 9;
-//	descriptor.SectorSize = 512;
-//
-//	std::shared_ptr<DiskMedia> diskMedia = DiskMedia::Create(descriptor);
-//	DiskMedia dm(DiskMediaType::DD_720);
-//	std::shared_ptr<DiskMedia> dm = DiskMedia::Create(DiskMediaType::DD_880);
 	std::shared_ptr<DiskMedia> dm = DiskMedia::Create(DiskMediaType::HD_1440);
 
 	dm->ReadSector(31);
@@ -134,11 +136,9 @@ int main(int argc, char** argv)
 		fs->AddFile(file);
 	}
 
-//	fat12->AddFile("hello.txt");
-//	fat12->AddFile("Tools/DiskEMU/Makefile");
-//	fat12->AddFile("LICENSE");
-//	fat12->SetLabel("REXXOS");
-//	fat12->StoreToImage();
+	if (!s_AppData.Label.empty())
+		fs->SetLabel(s_AppData.Label);
+
 	fs->StoreToImage();
 
 	dm->SaveImage("test.img");
