@@ -13,10 +13,14 @@ public:
     virtual void AddFile(const std::string& filename) override;
     virtual void RemoveFile(const std::string& filename) override;
 
+    virtual void AddBootsector(const std::string& filename) override;
+
     virtual void CreateFilesystem() override;
     virtual void StoreToImage() override;
 
     virtual void SetLabel(const std::string& label) override;
+
+    virtual uint32_t GetFreeSectorCount() override;
 
     virtual void PrintDirectory() override;
 
@@ -34,4 +38,6 @@ private:
 
 private:
     std::shared_ptr<DiskMedia> m_DiskMedia;
+
+    Metrics m_Metrics;
 };

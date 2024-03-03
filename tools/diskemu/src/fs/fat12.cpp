@@ -107,6 +107,8 @@ void Fat12::PrintDirectory()
     std::cout << "Directory reading\n"
         << "-----------------\n";
 
+    uint32_t totalFileSize = 0;
+
     for (FAT12DirectoryEntry& entry : s_FAT12Data.DirectoryEntries)
     {
         if (entry.Filename[0] == 0 || (entry.Attributes & (uint32_t)FAT12DirectoryFlag::VolumeLabel))
@@ -121,7 +123,13 @@ void Fat12::PrintDirectory()
             std::cout << entry.Filename[i + 8];
 
         std::cout << "  " << entry.FileSize << " bytes\n";
+
+        totalFileSize += entry.FileSize;
     }
+
+    std::cout << "\nTotal file size: " << totalFileSize << "\n";
+    std::cout << "Free size : " << (m_Metrics.TotalSectorCount - m_Metrics.UsedSectorCount) * s_BPBData.BytesPerSector << " bytes\n";
+    std::cout << "Total size: " << m_Metrics.TotalSectorCount * s_BPBData.BytesPerSector << " bytes\n";
 }
 
 
@@ -143,6 +151,8 @@ void Fat12::CreateFilesystem()
     DiskMedia::MediaDescriptor mediaDescriptor = m_DiskMedia->GetMediaDescriptor();
 
     uint32_t totalSectorCount = m_DiskMedia->GetTotalSectorCount();
+
+    m_Metrics.TotalSectorCount = totalSectorCount;
 
     if (totalSectorCount > 0xFFFF)
     {
@@ -194,6 +204,7 @@ void Fat12::CalculateFATData()
     s_FAT12Data.RootDirectoryLocation = location;
     s_FAT12Data.DataRegionStart = (s_FAT12Data.RootDirectoryLocation - 2) + (s_BPBData.MaxRootDirectoryEntries * sizeof(FAT12DirectoryEntry)) / s_BPBData.BytesPerSector;
 
+    m_Metrics.UsedSectorCount = s_FAT12Data.DataRegionStart + 2;
 //    std::cout << "Root directory: " << location << "\n";
 //    std::cout << "Data region start: " << s_FAT12Data.DataRegionStart << "\n";
 
@@ -349,6 +360,12 @@ void Fat12::AddFile(const std::string& filename)
 
     uint32_t neededSectors = (fileSize / s_BPBData.BytesPerSector) + 1;
 
+    if (neededSectors > (m_Metrics.TotalSectorCount - m_Metrics.UsedSectorCount))
+    {
+        std::cout << "File " << filename << " is too large for the medium.\n";
+        return;
+    }
+
 //    std::cout << "Needed sectors on disk: " << neededSectors << "\n";
 
     // Write directory entry
@@ -378,6 +395,8 @@ void Fat12::AddFile(const std::string& filename)
         m_DiskMedia->WriteToSector(s_FAT12Data.DataRegionStart + nextCluster, (const char*)data.data() + (dataIndex++ * s_BPBData.BytesPerSector), 
             dataRemaining > s_BPBData.BytesPerSector ? s_BPBData.BytesPerSector : dataRemaining);
 
+        m_Metrics.UsedSectorCount++;
+
         if (dataRemaining > s_BPBData.BytesPerSector)
         {
             dataRemaining -= s_BPBData.BytesPerSector;
@@ -392,6 +411,43 @@ void Fat12::AddFile(const std::string& filename)
         }
     }
 
+}
+
+void Fat12::AddBootsector(const std::string& filename)
+{
+    std::ifstream fs(filename, std::ios::in | std::ios::binary);
+
+    if (!fs.is_open())
+    {
+        std::cout << "Unable to open bootsector file " << filename << "\n";
+        return;
+    }
+
+    size_t fileSize;
+
+    fs.seekg(0, fs.end);
+    fileSize = fs.tellg();
+    fs.seekg(0, fs.beg);
+
+    std::vector<uint8_t> fileData(fileSize);
+    fs.read((char*)fileData.data(), fileSize);
+
+    fs.close();
+
+    if (fileSize != 512)
+    {
+        std::cout << "Invalid bootsector filesize. Should be 512 bytes, but are " << fileSize << " bytes.\n";
+        return;
+    }
+
+    if (!(fileData[510] == 0x55 && fileData[511] == 0xAA))
+    {
+        std::cout << "Invalid bootsector signature.\n";
+        return;
+    }
+
+    m_DiskMedia->WriteToSector(0, (const char*)fileData.data(), s_BPBData.BytesPerSector, 0);
+//    m_DiskMedia->WriteToSector(0, )
 }
 
 void Fat12::SetLabel(const std::string& label)
@@ -422,4 +478,9 @@ uint32_t Fat12::FindRootDirectoryEntry()
     }
 
     return -1;
+}
+
+uint32_t Fat12::GetFreeSectorCount()
+{
+    return (m_Metrics.TotalSectorCount - m_Metrics.UsedSectorCount);
 }

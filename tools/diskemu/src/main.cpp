@@ -139,6 +139,9 @@ int main(int argc, char** argv)
 	if (!s_AppData.Label.empty())
 		fs->SetLabel(s_AppData.Label);
 
+	if (!s_AppData.Bootloader.empty())
+		fs->AddBootsector(s_AppData.Bootloader);
+
 	fs->StoreToImage();
 
 	dm->SaveImage("test.img");
