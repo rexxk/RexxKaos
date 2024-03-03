@@ -50,3 +50,15 @@ void GetFAT12Filename(const std::string& path, char* filename)
 
 }
 
+std::string CleanJSONString(const std::string& str)
+{
+    std::string cleanedString = "";
+
+    for (size_t i = 0; i < str.size(); i++)
+    {
+        if (std::isalnum(str[i]) || str[i] == '.')
+            cleanedString += str[i];
+    }
+
+    return cleanedString;
+}

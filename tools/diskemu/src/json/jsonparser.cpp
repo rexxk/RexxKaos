@@ -1,5 +1,7 @@
 #include "jsonparser.h"
 
+#include "utils/StringTools.h"
+
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -16,7 +18,7 @@ JSONImportResult JSONParser::ParseFile(const std::string& path)
 		return importResult;
 	}
 
-	std::cout << "Parsing JSON:\n";
+//	std::cout << "Parsing JSON:\n";
 
 	size_t fileLength;
 
@@ -31,7 +33,7 @@ JSONImportResult JSONParser::ParseFile(const std::string& path)
 
 	std::stringstream ss(fileBuffer.data());
 
-	std::cout << "File length: " << fileLength << " bytes\n";
+//	std::cout << "File length: " << fileLength << " bytes\n";
 
 	while (!ss.eof())
 	{
@@ -68,13 +70,6 @@ JSONParser::Block JSONParser::ReadBlock(std::stringstream& ss)
 			auto [attribute, values] = ReadValue(ss);
 
 			newBlock.Attributes[attribute] = values;
-
-//			std::cout << "Attribute: " << attribute << ": ";
-
-//			for (auto& value : values)
-//				std::cout << value << " ";
-
-//			std::cout << "\n";
 		}
 
 		ss >> c;
@@ -101,7 +96,7 @@ JSONParser::BlockValue JSONParser::ReadValue(std::stringstream& ss)
 
 			if (value == "]")
 				break;
-			else
+			else 
 				values.push_back(value);
 		}
 	}
@@ -118,23 +113,8 @@ std::string JSONParser::GetValueString(std::stringstream& ss)
 	std::string value;
 	ss >> value;
 
-	size_t valueSize = value.size();
-
-	if (value[valueSize - 1] == ':')
-	{
-		value = value.substr(0, valueSize - 2);
-		valueSize = value.size();
-	}
-
-	if (value[valueSize - 1] == ',')
-	{
-		value = value.substr(0, valueSize - 1);
-	}
-
-	if (value[0] == '\"' && value.size() > 2)
-	{
-		value = value.substr(1, value.size() - 2);
-	}
-
-	return value;
+	if (value == "[" || value == "]")
+		return value;
+	
+	return CleanJSONString(value);
 }
