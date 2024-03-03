@@ -1,6 +1,6 @@
 {
     "filesystem": "fat12",
-    "boot": null,
+    "boot": "bin/bootloader.bin",
     "label": "RexxOS",
 
     "files":
@@ -8,6 +8,7 @@
         "hello.txt",
         "LICENSE",
         "Makefile",
+        "test.img",
         "build.sh"        
     ]
 

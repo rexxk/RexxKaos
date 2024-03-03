@@ -56,7 +56,7 @@ std::string CleanJSONString(const std::string& str)
 
     for (size_t i = 0; i < str.size(); i++)
     {
-        if (std::isalnum(str[i]) || str[i] == '.')
+        if (std::isalnum(str[i]) || str[i] == '.' || str[i] == '/' || str[i] == '\\')
             cleanedString += str[i];
     }
 

@@ -9,6 +9,7 @@ objdir "%{wks.location}/bin-int/%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture
 
 group "Tools"
 	include "tools/diskemu"
+	include "tools/debugger"
 
 group "Kernel"
 
