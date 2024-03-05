@@ -9,7 +9,8 @@
         "LICENSE",
         "Makefile",
         "test.img",
-        "build.sh"        
+        "build.sh",
+        "bin/loader.bin"
     ]
 
 }

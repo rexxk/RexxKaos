@@ -254,20 +254,19 @@ start:
 		cmp		dx, 0x0FF0
 		jne		.readFileSector
 
+.jumpStage:
+
 		mov		bx, BIOSParamBlock
 		mov		dl, byte [driveNumber]
 
 		mov		ax, FILE_SEG
 		mov		ds, ax
 		xor		si, si
-		call	PrintString 
+;		call	PrintString 
 
+		jmp		0x2000:0x0000
 
-
-		sti
-
-		hlt
-
+		jmp		$
 
 
 
@@ -279,7 +278,7 @@ msgLoading: 	db	"Loading...", CRLF, 0
 msgProgress:	db  ".", 0
 msgFileNotFound: db "File not found", CRLF, 0
 
-loaderFilename:	db	"LICENSE    "
+loaderFilename:	db	"LOADER  BIN"
 ;loaderFilename:	db	"HELLO   TXT"
 
 sector:			db	0
