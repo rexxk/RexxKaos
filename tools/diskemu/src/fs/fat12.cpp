@@ -261,7 +261,7 @@ void Fat12::StoreToImage()
 
     std::vector<uint8_t> fatTable;
 
-    uint8_t lowValue = 0;
+/*    uint8_t lowValue = 0;
     uint8_t midValue = 0;
     uint8_t highValue = 0;
 
@@ -271,8 +271,8 @@ void Fat12::StoreToImage()
 
         if (i & 1)
         {
-            highValue = (uint8_t)(value >> 4) & 0xFF;
-            midValue = (uint8_t)(value & 0xF) << 4;
+            highValue += (uint8_t)(value >> 4) & 0xFF;
+            midValue += (uint8_t)(value & 0xF) << 4;
 
             fatTable.push_back(lowValue);
             fatTable.push_back(midValue);
@@ -284,10 +284,40 @@ void Fat12::StoreToImage()
         }
         else
         {
-            midValue = (uint8_t)(value >> 8) & 0xF0;
-            lowValue = (uint8_t)(value & 0xFF);
+//            midValue = (uint8_t)(value >> 8) & 0xF0;
+            midValue += (uint8_t)(value >> 8) & 0x0F;
+            lowValue += (uint8_t)(value & 0xFF);
         }
     }
+*/
+
+    uint32_t fatPair = 0;
+
+    for (uint32_t i = 0; i < (uint32_t)s_FAT12Data.FATTable.size(); i++)
+    {
+        
+        uint16_t value = s_FAT12Data.FATTable[i];
+
+        if (i & 1)
+        {
+            fatPair += (value & 0x0FFF) << 12;
+
+            uint8_t lowValue = (uint8_t)(fatPair & 0xFF);
+            uint8_t midValue = (uint8_t)(fatPair >> 8) & 0xFF;
+            uint8_t highValue = (uint8_t)(fatPair >> 16) & 0xFF;
+
+            fatTable.push_back(lowValue);
+            fatTable.push_back(midValue);
+            fatTable.push_back(highValue);
+
+            fatPair = 0;
+        }
+        else
+        {
+            fatPair += (value & 0x0FFF);
+        }
+    }
+
 
     uint32_t fatSectors = ((uint32_t)fatTable.size() / s_BPBData.BytesPerSector) + 1;
 
@@ -389,7 +419,7 @@ void Fat12::AddFile(const std::string& filename)
         else
         {
             dataRemaining = 0;
-//            SetFATEntry(nextCluster, 0xFFF);
+            SetFATEntry(nextCluster, 0xFFF);
         }
     }
 
