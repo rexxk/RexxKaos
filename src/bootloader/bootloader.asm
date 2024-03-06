@@ -261,8 +261,30 @@ start:
 
 		mov		ax, FILE_SEG
 		mov		ds, ax
+		mov		es, ax
 		xor		si, si
 ;		call	PrintString 
+
+.parseElfImage:
+		; Barebone plain simple data readout and copy
+
+		add		si, 0x20
+		mov		edx, dword [ds:si]
+
+		xor		si, si
+		add		si, dx
+
+		add		si, 0x08
+		mov		edx, dword [ds:si]
+
+		add		si, 0x18
+		mov		ecx, dword [ds:si]
+
+.copyElf:
+		mov		si, dx
+		xor		di, di
+		rep		movsb
+		
 
 		jmp		0x2000:0x0000
 
