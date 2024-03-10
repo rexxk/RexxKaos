@@ -1,8 +1,5 @@
 
 
-        SECTION .strapcode
-
-
 EnableA20:
 
         cli

@@ -161,7 +161,7 @@ start:
 
 .findRootDirectory:
 
-		; Load root directory into 0x1400
+		; Load root directory into 0x14000
 
 		mov		ax, ROOT_SEG
 		mov		es, ax
@@ -222,7 +222,7 @@ start:
 .loadFile:
 		; FAT entry to read in ax		
 
-		; Load into 0x0200:0x0000
+		; Load into 0x2000:0x0000
 
 		mov		bx, FILE_SEG
 		mov		es, bx
@@ -286,42 +286,6 @@ start:
 		cmp		dx, 0x0FF0
 		jne		.readFileSector
 
-.jumpStage:
-
-		mov		ax, FILE_SEG
-		mov		ds, ax
-		mov		es, ax
-		xor		si, si
-;		call	PrintString 
-
-.parseElfImage:
-		; Barebone plain simple data readout and copy
-
-		add		si, 0x20
-;		add		si, 0x1C
-		mov		edx, dword [ds:si]
-
-		xor		si, si
-		add		si, dx
-
-		add		si, 0x08
-;		add		si, 0x04
-		mov		edx, dword [ds:si]
-
-		add		si, 0x18
-;		add		si, 0x0B
-		mov		ecx, dword [ds:si]
-
-.copyElf:
-		mov		si, dx
-		xor		di, di
-		rep		movsb
-
-.doneCopyElf:
-		
-		mov		bx, BIOSParamBlock
-		mov		dl, byte [driveNumber]
-
 		jmp		stage2
 
 		jmp		$
@@ -354,9 +318,94 @@ times 510-($-$$)	db	0
 %include "a20.inc"
 
 stage2:
+
 		call	EnableA20
 
-		jmp		0x2000:0x0000
+		lgdt	[gdtStruct]
+
+		mov		eax, cr0
+		or		eax, 1
+		mov		cr0, eax
+
+		jmp		0x08:pmode
+
+		bits	32
+
+pmode:
+		
+		mov		ax, 0x10
+		mov		ds, ax
+		mov		es, ax
+		mov		fs, ax
+		mov		gs, ax
+
+		mov		ss, ax
+		mov		esp, 0x90000
+
+		mov		esi, 0x20000
+
+.parseElfImage:
+		; Barebone plain simple data readout and copy
+
+		add		esi, 0x20
+		mov		edx, [esi]
+
+		mov		esi, 0x20000
+		mov		ebx, esi
+		add		esi, edx
+
+		add		esi, 0x08
+		add		ebx, [esi]
+
+		add		esi, 0x10
+		mov		edi, [esi]
+
+		add		esi, 0x8
+		mov		ecx, [esi]
+
+.copyElf:
+		mov		esi, ebx
+;		xor		edi, edi
+		rep		movsb
+
+.doneCopyElf:
+
+
+
+.jump32bit:
+		mov		bx, BIOSParamBlock
+		mov		dl, byte [driveNumber]
+
+		jmp		0x8:0x01000000
 
 		
 		jmp		$
+
+
+gdtData:
+		; Null descriptor
+		dd		0
+		dd		0
+
+		; Kernel code descriptor
+		dw		0xFFFF
+		dw		0
+		db		0
+		db		0x9A
+		db		0xCF
+		db		0
+
+		; Kernel data descriptor
+		dw		0xFFFF
+		dw		0
+		db		0
+		db		0x92
+		db		0xCF
+		db		0
+
+endGdtData:
+
+gdtStruct:
+		; Limit (size of GDT)
+		dw		endGdtData - gdtData - 1
+		dd		gdtData
