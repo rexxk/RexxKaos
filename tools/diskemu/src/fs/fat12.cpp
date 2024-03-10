@@ -193,6 +193,8 @@ void Fat12::CalculateFATData()
 {
     uint16_t location = s_BPBData.ReservedSectorsCount;
 
+    s_FAT12Data.FATLocations.clear();
+
     for (uint32_t i = 0; i < s_BPBData.NumberOfFATs; i++)
     {
         s_FAT12Data.FATLocations.push_back(location);
@@ -217,7 +219,7 @@ void Fat12::CalculateFATData()
     SetFATEntry(1, 0xFFF);
 
     s_FAT12Data.DirectoryEntries.resize(s_BPBData.MaxRootDirectoryEntries);
-    ClearDirectory(s_FAT12Data.RootDirectoryLocation);
+//    ClearDirectory(s_FAT12Data.RootDirectoryLocation);
 }
 
 void Fat12::ClearDirectory(uint32_t sector)
@@ -254,7 +256,7 @@ uint32_t Fat12::FindFirstFreeFATEntry(uint32_t offset)
 
 void Fat12::StoreToImage()
 {
-    // Write bootblock    
+    // Write bootparam data
     m_DiskMedia->WriteToSector(0, (const char*)&s_BPBData, sizeof(s_BPBData), 3);
 
     // Write FAT tables
@@ -416,11 +418,15 @@ void Fat12::AddBootsector(const std::string& filename)
 
     fs.close();
 
-    if (fileSize != 512)
-    {
-        std::cout << "Invalid bootsector filesize. Should be 512 bytes, but are " << fileSize << " bytes.\n";
-        return;
-    }
+    s_BPBData.ReservedSectorsCount = ((uint16_t)fileSize / s_BPBData.BytesPerSector) + 1;
+
+    CalculateFATData();
+
+//    if (fileSize != 512)
+//    {
+//        std::cout << "Invalid bootsector filesize. Should be 512 bytes, but are " << fileSize << " bytes.\n";
+//        return;
+//    }
 
     if (!(fileData[510] == 0x55 && fileData[511] == 0xAA))
     {
@@ -428,7 +434,10 @@ void Fat12::AddBootsector(const std::string& filename)
         return;
     }
 
-    m_DiskMedia->WriteToSector(0, (const char*)fileData.data(), s_BPBData.BytesPerSector, 0);
+    std::memcpy((uint8_t*)fileData.data() + 3, (char*)&s_BPBData, sizeof(s_BPBData));
+
+    for (uint32_t i = 0; i < s_BPBData.ReservedSectorsCount; i++)
+        m_DiskMedia->WriteToSector(i, (const char*)fileData.data() + (i * s_BPBData.BytesPerSector), s_BPBData.BytesPerSector, 0);
 }
 
 void Fat12::SetLabel(const std::string& label)

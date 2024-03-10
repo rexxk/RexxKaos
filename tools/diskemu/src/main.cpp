@@ -126,6 +126,9 @@ int main(int argc, char** argv)
 	std::shared_ptr<DiskMedia> dm = DiskMedia::Create(DiskMediaType::HD_1440);
 	std::shared_ptr<Filesystem> fs = Filesystem::Create(dm, s_AppData.FSType);
 
+	if (!s_AppData.Bootloader.empty())
+		fs->AddBootsector(s_AppData.Bootloader);
+
 	for (auto& file : s_AppData.FileList)
 	{
 		fs->AddFile(file);
@@ -134,8 +137,6 @@ int main(int argc, char** argv)
 	if (!s_AppData.Label.empty())
 		fs->SetLabel(s_AppData.Label);
 
-	if (!s_AppData.Bootloader.empty())
-		fs->AddBootsector(s_AppData.Bootloader);
 
 	fs->StoreToImage();
 

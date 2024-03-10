@@ -107,6 +107,37 @@ start:
 		mov		si, msgLoading
 		call	PrintString
 
+		; BIOS only loads first sector, if there are more,
+		; they needs to be loaded here!
+
+		mov		cx, word [bpbReservedSectors]
+		dec		cx
+
+		; Load into 0x7E00 and onwards
+		mov		bx, 0x7E00
+		mov		dx, 1
+
+.loadBootsector:
+		cmp		cx, 0
+		je		.loadFAT
+
+		push	cx
+
+		mov		ax, dx
+		call	LBA2CHS
+
+		mov		al, 1
+		call	ReadSectors
+
+		pop		cx
+
+		dec		cx
+
+		add		bx, 0x200
+		inc		dx
+
+		jmp		.loadBootsector
+
 .loadFAT:
 		; Load FAT entry into 0x10000
 
@@ -202,7 +233,8 @@ start:
 		push	ax
 
 		; Data block starts at sector 31 in a FAT12 environment
-		add		ax, 31
+		add		ax, word [bpbReservedSectors]
+		add		ax, 30
 		call	LBA2CHS
 
 		; Read the sector
@@ -256,9 +288,6 @@ start:
 
 .jumpStage:
 
-		mov		bx, BIOSParamBlock
-		mov		dl, byte [driveNumber]
-
 		mov		ax, FILE_SEG
 		mov		ds, ax
 		mov		es, ax
@@ -269,24 +298,31 @@ start:
 		; Barebone plain simple data readout and copy
 
 		add		si, 0x20
+;		add		si, 0x1C
 		mov		edx, dword [ds:si]
 
 		xor		si, si
 		add		si, dx
 
 		add		si, 0x08
+;		add		si, 0x04
 		mov		edx, dword [ds:si]
 
 		add		si, 0x18
+;		add		si, 0x0B
 		mov		ecx, dword [ds:si]
 
 .copyElf:
 		mov		si, dx
 		xor		di, di
 		rep		movsb
-		
 
-		jmp		0x2000:0x0000
+.doneCopyElf:
+		
+		mov		bx, BIOSParamBlock
+		mov		dl, byte [driveNumber]
+
+		jmp		stage2
 
 		jmp		$
 
@@ -311,3 +347,16 @@ driveNumber:	db	0
 times 510-($-$$)	db	0
 
 		dw		0xAA55
+
+
+; 32-bit promotion code
+
+%include "a20.inc"
+
+stage2:
+		call	EnableA20
+
+		jmp		0x2000:0x0000
+
+		
+		jmp		$

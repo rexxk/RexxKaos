@@ -7,8 +7,15 @@
 
         global _entry
 _entry:
+
+        jmp     _start
+
+
+%include "a20.inc"
+
 ;        mov     byte [driveNumber], dl
 
+_start:
         mov     ax, 0x2000
         mov     ds, ax
         mov     es, ax
@@ -16,6 +23,8 @@ _entry:
         mov     ax, 0x1000
         mov     ss, ax
         mov     sp, 0xFFFF
+
+        call    EnableA20
 
         mov     esi, bootMessage
         call    PrintString
@@ -42,6 +51,7 @@ PrintString:
 		ret
 
 
+%include "floppy.inc"
 
 
         SECTION .strapdata
