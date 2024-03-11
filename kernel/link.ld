@@ -2,7 +2,7 @@ ENTRY(_entry)
 
 OUTPUT_FORMAT(elf64-x86-64)
 
-OUTPUT(loader.bin)
+OUTPUT(kernel.sys)
 
 SECTIONS {
 

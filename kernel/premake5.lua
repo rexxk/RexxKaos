@@ -1,0 +1,32 @@
+project "kernel"
+	kind "ConsoleApp"
+	language "C++"
+--	cppdialect "c++20"
+
+	includedirs
+	{
+		"%{prj.location}/src",
+	}
+	
+	files
+	{
+		"src/**.h",
+		"src/**.cpp",
+	}
+
+	links
+	{
+--		"bin/entry",
+	}
+
+	filter "configurations:Debug"
+		defines { "DEBUG" }
+	
+	filter "configurations:Release"
+		defines { "RELEASE" }
+
+	filter "system:linux"
+		targetdir "../bin"
+		targetname "kernel.sys"
+		buildoptions { "-ffreestanding" }
+		linkoptions { "-nostdlib -Tlink.ld ../bin/entry.o" }

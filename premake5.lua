@@ -12,4 +12,5 @@ group "Tools"
 	include "tools/debugger"
 
 group "Kernel"
+	include "kernel"
 

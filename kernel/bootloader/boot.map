@@ -1,0 +1,92 @@
+
+- NASM Map file ---------------------------------------------------------------
+
+Source file:  bootloader.asm
+Output file:  bootloader.bin
+
+-- Program origin -------------------------------------------------------------
+
+00007C00
+
+-- Sections (summary) ---------------------------------------------------------
+
+Vstart            Start             Stop              Length    Class     Name
+            7C00              7C00              7EC1  000002C1  progbits  .text
+
+-- Sections (detailed) --------------------------------------------------------
+
+---- Section .text ------------------------------------------------------------
+
+class:     progbits
+length:                 2C1
+start:                 7C00
+align:     not defined
+follows:   not defined
+vstart:                7C00
+valign:    not defined
+vfollows:  not defined
+
+-- Symbols --------------------------------------------------------------------
+
+---- Section .text ------------------------------------------------------------
+
+Real              Virtual           Name
+            7C00              7C00  entry
+            7C03              7C03  BIOSParamBlock
+            7C03              7C03  bpbOEMName
+            7C0B              7C0B  bpbBytesPerSector
+            7C0D              7C0D  bpbSectorsPerCluster
+            7C0E              7C0E  bpbReservedSectors
+            7C10              7C10  bpbNumberOfFATs
+            7C11              7C11  bpbMaxRootDirectories
+            7C13              7C13  bpbTotalSectors
+            7C15              7C15  bpbMediaDescriptor
+            7C16              7C16  bpbSectorsPerFAT
+            7C18              7C18  bpbSectorsPerTrack
+            7C1A              7C1A  bpbNumberOfHeads
+            7C1C              7C1C  bpbHiddenSectors
+            7C20              7C20  bpbTotalSectorsLarge
+            7C24              7C24  bpbDriveNumber
+            7C25              7C25  bpbFlagsWindowsNT
+            7C26              7C26  bpbBootSignature
+            7C27              7C27  bpbVolumeID
+            7C2B              7C2B  bpbVolumeLabel
+            7C36              7C36  bpbFilesystem
+            7C3E              7C3E  PrintString
+            7C49              7C49  PrintString.printDone
+            7C4A              7C4A  LBA2CHS
+            7C64              7C64  ReadSectors
+            7C79              7C79  start
+            7C9D              7C9D  start.loadBootsector
+            7CB6              7CB6  start.loadFAT
+            7CCC              7CCC  start.findRootDirectory
+            7CE7              7CE7  start.findFileEntry
+            7CED              7CED  start.checkFilename
+            7D08              7D08  start.foundEntry
+            7D10              7D10  start.loadFile
+            7D17              7D17  start.readFileSector
+            7D2C              7D2C  start.getNextEntry
+            7D45              7D45  start.oddEntry
+            7D4A              7D4A  start.evenEntry
+            7D4D              7D4D  start.fatOK
+            7D5F              7D5F  msgLoading
+            7D6C              7D6C  msgProgress
+            7D6E              7D6E  msgFileNotFound
+            7D7F              7D7F  loaderFilename
+            7D8A              7D8A  sector
+            7D8B              7D8B  head
+            7D8C              7D8C  cylinder
+            7D8D              7D8D  driveNumber
+            7E00              7E00  EnableA20
+            7E32              7E32  A20Wait
+            7E39              7E39  A20Wait2
+            7E40              7E40  stage2
+            7E57              7E57  pmode
+            7E6F              7E6F  pmode.parseElfImage
+            7E8C              7E8C  pmode.copyElf
+            7E90              7E90  pmode.doneCopyElf
+            7E90              7E90  pmode.jump32bit
+            7EA3              7EA3  gdtData
+            7EBB              7EBB  endGdtData
+            7EBB              7EBB  gdtStruct
+

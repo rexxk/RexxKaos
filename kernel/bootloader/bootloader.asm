@@ -300,7 +300,7 @@ msgLoading: 	db	"Loading...", CRLF, 0
 msgProgress:	db  ".", 0
 msgFileNotFound: db "File not found", CRLF, 0
 
-loaderFilename:	db	"LOADER  BIN"
+loaderFilename:	db	"KERNEL  SYS"
 ;loaderFilename:	db	"HELLO   TXT"
 
 sector:			db	0
