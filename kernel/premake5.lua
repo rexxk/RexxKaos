@@ -1,6 +1,6 @@
 project "kernel"
 	kind "ConsoleApp"
-	language "C++"
+	language "C"
 --	cppdialect "c++20"
 
 	includedirs
@@ -29,4 +29,4 @@ project "kernel"
 		targetdir "../bin"
 		targetname "kernel.sys"
 		buildoptions { "-ffreestanding" }
-		linkoptions { "-nostdlib -Tlink.ld ../bin/entry.o" }
+		linkoptions { "-nostdlib -z noexecstack -Tlink.ld ../bin/entry.o" }

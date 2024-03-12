@@ -344,22 +344,50 @@ pmode:
 
 		mov		esi, 0x20000
 
+		xor		ecx, ecx
+
 .parseElfImage:
 		; Barebone plain simple data readout and copy
 
-		add		esi, 0x20
+		; Program entry address
+		add		esi, 0x18
+		mov		eax, [esi]
+
+		push	eax
+
+		; Start of program header table
+		add		esi, 0x8
 		mov		edx, [esi]
 
+		; Number of program header entries
+		add		esi, 0x18
+		mov		cx, word [esi]
+
+
+		; Set esi to start of program header table
 		mov		esi, 0x20000
 		mov		ebx, esi
 		add		esi, edx
 
+.readProgramHeader:
+
+		push	esi
+
+		mov		eax, [esi]
+		cmp		eax, 1
+
+		jne		.skipHeader
+
+		; Offset in file
 		add		esi, 0x08
 		add		ebx, [esi]
 
+		; Physical address
 		add		esi, 0x10
 		mov		edi, [esi]
 
+		; File size
+		push	ecx
 		add		esi, 0x8
 		mov		ecx, [esi]
 
@@ -367,6 +395,23 @@ pmode:
 		mov		esi, ebx
 ;		xor		edi, edi
 		rep		movsb
+
+		pop		ecx
+
+		jmp		.headerDone	
+
+.skipHeader:
+		add		esi, 0x20
+
+.headerDone:
+
+		pop		esi
+		add		esi, 0x38		; Hardcoded length of program header
+
+		dec		ecx
+
+		cmp		cx, 0
+		jne		.readProgramHeader
 
 .doneCopyElf:
 
@@ -376,7 +421,9 @@ pmode:
 		mov		bx, BIOSParamBlock
 		mov		dl, byte [driveNumber]
 
-		jmp		0x8:0x01000000
+		pop		eax
+
+		jmp		eax
 
 		
 		jmp		$

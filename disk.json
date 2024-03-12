@@ -10,7 +10,7 @@
         "Makefile",
         "test.img",
         "build.sh",
-        "bin/loader.bin"
+        "bin/kernel.sys"
     ]
 
 }

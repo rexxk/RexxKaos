@@ -29,8 +29,8 @@ ALL_CXXFLAGS += $(CXXFLAGS) $(ALL_CPPFLAGS) -m64 -ffreestanding
 ALL_RESFLAGS += $(RESFLAGS) $(DEFINES) $(INCLUDES)
 LIBS +=
 LDDEPS +=
-ALL_LDFLAGS += $(LDFLAGS) -L/usr/lib64 -m64 -s -nostdlib -Tlink.ld ../bin/entry.o
-LINKCMD = $(CXX) -o "$@" $(OBJECTS) $(RESOURCES) $(ALL_LDFLAGS) $(LIBS)
+ALL_LDFLAGS += $(LDFLAGS) -L/usr/lib64 -m64 -s -nostdlib -z noexecstack -Tlink.ld ../bin/entry.o
+LINKCMD = $(CC) -o "$@" $(OBJECTS) $(RESOURCES) $(ALL_LDFLAGS) $(LIBS)
 define PREBUILDCMDS
 endef
 define PRELINKCMDS
@@ -108,7 +108,7 @@ ifneq (,$(PCH))
 $(OBJECTS): $(GCH) | $(PCH_PLACEHOLDER)
 $(GCH): $(PCH) | prebuild
 	@echo $(notdir $<)
-	$(SILENT) $(CXX) -x c++-header $(ALL_CXXFLAGS) -o "$@" -MF "$(@:%.gch=%.d)" -c "$<"
+	$(SILENT) $(CC) -x c-header $(ALL_CFLAGS) -o "$@" -MF "$(@:%.gch=%.d)" -c "$<"
 $(PCH_PLACEHOLDER): $(GCH) | $(OBJDIR)
 ifeq (posix,$(SHELLTYPE))
 	$(SILENT) touch "$@"

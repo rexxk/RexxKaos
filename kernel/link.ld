@@ -6,17 +6,11 @@ OUTPUT(kernel.sys)
 
 SECTIONS {
 
-    . = 0x20000;
-
-    .strapcode : { *(.strapcode) }
-
-    . = ALIGN(4096);
-
-    .strapdata : { *(.strapdata) }
-
     . = 0x1000000;
 
     .text : { *(.text) }
-    .data : { *(.data) }
-    .bss : { *(.bss) }
+
+    .data : ALIGN(4096) { *(.data) }
+
+    .bss : ALIGN(4096) { *(.bss) }
 }

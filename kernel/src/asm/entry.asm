@@ -3,7 +3,6 @@
 
         SECTION .text
 
-        extern _kernel_entry
 
         global _entry
 _entry:
@@ -11,14 +10,15 @@ _entry:
         jmp     _start
 
 
+        extern _kernel_entry
 
 _start:
         mov     byte [driveNumber], dl
 
         call     _kernel_entry
         
-        mov     esi, 0xB8000
-        mov     [esi], word 0x4545
+;        mov     esi, 0xB8000
+;        mov     [esi], word 0x4545
 
         jmp     $
 
