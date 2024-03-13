@@ -20,6 +20,8 @@ _start:
 ;        mov     esi, 0xB8000
 ;        mov     [esi], word 0x4545
 
+        sti
+
         jmp     $
 
 

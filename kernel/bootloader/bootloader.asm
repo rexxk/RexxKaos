@@ -350,65 +350,62 @@ pmode:
 		; Barebone plain simple data readout and copy
 
 		; Program entry address
-		add		esi, 0x18
-		mov		eax, [esi]
+		mov		eax, [esi+0x18]
 
 		push	eax
 
 		; Start of program header table
-		add		esi, 0x8
-		mov		edx, [esi]
+		mov		edx, [esi+0x20]
 
 		; Number of program header entries
-		add		esi, 0x18
-		mov		cx, word [esi]
+		mov		cx, word [esi+0x38]
+		mov		[ELFProgramHeaderEntries], cx
 
+		; Number of section header entries
+		mov		cx, word [esi+0x3C]
+		mov		[ELFSectionHeaderEntries], cx
 
 		; Set esi to start of program header table
 		mov		esi, 0x20000
 		mov		ebx, esi
 		add		esi, edx
 
-.readProgramHeader:
+		mov		cx, [ELFProgramHeaderEntries]
 
-		push	esi
+.readProgramHeader:
+		mov		[ELFProgramHeaderEntries], cx
+
+;		push	esi
 
 		mov		eax, [esi]
 		cmp		eax, 1
 
-		jne		.skipHeader
+		jne		.programHeaderDone
 
 		; Offset in file
-		add		esi, 0x08
-		add		ebx, [esi]
+		add		ebx, [esi+0x08]
 
 		; Physical address
-		add		esi, 0x10
-		mov		edi, [esi]
+		mov		edi, [esi+0x18]
 
 		; File size
-		push	ecx
-		add		esi, 0x8
-		mov		ecx, [esi]
+		mov		ecx, [esi+0x20]
 
-.copyElf:
+.copyProgramHeader:
+		push	esi
 		mov		esi, ebx
-;		xor		edi, edi
 		rep		movsb
-
-		pop		ecx
-
-		jmp		.headerDone	
-
-.skipHeader:
-		add		esi, 0x20
-
-.headerDone:
-
 		pop		esi
+
+		mov		cx, word [ELFProgramHeaderEntries] 
+
+		jmp		.programHeaderDone	
+
+.programHeaderDone:
+
 		add		esi, 0x38		; Hardcoded length of program header
 
-		dec		ecx
+		dec		cx
 
 		cmp		cx, 0
 		jne		.readProgramHeader
@@ -456,3 +453,6 @@ gdtStruct:
 		; Limit (size of GDT)
 		dw		endGdtData - gdtData - 1
 		dd		gdtData
+
+ELFProgramHeaderEntries:	dw		0
+ELFSectionHeaderEntries:	dw		0
