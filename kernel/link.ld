@@ -6,7 +6,7 @@ OUTPUT(kernel.sys)
 
 SECTIONS {
 
-    . = 0x1000000;
+    . = 0x00100000;
 
     .text : { *(.text) }
 

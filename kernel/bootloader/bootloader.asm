@@ -3,10 +3,15 @@
 
 		[map all boot.map]
 
-%define FAT_SEG		0x1000
-%define ROOT_SEG	0x1400
-%define FILE_SEG	0x2000
+%define FAT_SEG			0x1000
+%define ROOT_SEG		0x1400
+%define FILE_SEG		0x2000
+%define FILE_ADDRESS	0x20000
 
+%define PAGE_MAP_ADDRESS	0x1000
+
+%define PAGE_PRESENT	(1 << 0)
+%define PAGE_WRITE		(1 << 1)
 
 entry:
 		jmp short start
@@ -321,17 +326,104 @@ stage2:
 
 		call	EnableA20
 
+; Entring 64-bit longmode
+		xor		ax, ax
+		mov		es, ax
+		mov		edi, PAGE_MAP_ADDRESS
+
+		; Clear page map, 16 kb (0x4000 bytes)
+.clearPageMap:
+		push	di
+		mov		ecx, 0x1000
+		xor		eax, eax
+		cld
+		rep		stosd
+
+		pop		di
+
+		; Build Page Map Level 4
+.buildPML:
+		; Pointer to PDPT into eax
+		lea		eax, [es:di + 0x1000]
+		or		eax, PAGE_PRESENT | PAGE_WRITE
+		mov		[es:di], eax
+
+		; Build Page Directory Pointer Table
+.buildPDPT:
+		; Address to Page Directory into eax
+		lea		eax, [es:di + 0x2000]
+		or		eax, PAGE_PRESENT | PAGE_WRITE
+		mov		[es:di + 0x1000], eax
+
+		; Build Page Directory
+.buildPD:
+		; Address to Page Table into eax
+		lea		eax, [es:di + 0x3000]
+		or		eax, PAGE_PRESENT | PAGE_WRITE
+		mov		[es:di + 0x2000], eax
+
+		push	di
+		; Point to page table
+		lea		di, [di + 0x3000]
+		mov		eax, PAGE_PRESENT | PAGE_WRITE
+
+		; Build the page table
+.loopPageTable:
+		mov		[es:di], eax
+		add		eax, 0x1000
+		add		di, 8
+		cmp		eax, 0x200000
+		jb		.loopPageTable
+
+		pop		di
+
+		; Setup descriptor tables
+
+		; Disable IRQs
+		mov		al, 0xFF
+		out		0xA1, al
+		out		0x21, al
+
+		nop
+		nop
+
+		lidt	[idt]
+
+		; Enter long mode
+
+		; Set PAE and PGE bits
+		mov		eax, 10100000b
+		mov		cr4, eax
+
+		; PML4 into CR3
+		mov		edx, edi
+		mov		cr3, edx
+
+		mov		ecx, 0xC0000080
+		rdmsr
+
+		or		eax, 0x00000100
+		wrmsr
+
+		mov		ebx, cr0
+		or		ebx, 0x80000001
+		mov		cr0, ebx
+
+; End of new 64-bit entry code
+
 		lgdt	[gdtStruct]
 
-		mov		eax, cr0
-		or		eax, 1
-		mov		cr0, eax
+;		mov		eax, cr0
+;		or		eax, 1
+;		mov		cr0, eax
 
-		jmp		0x08:pmode
+		jmp		0x08:longmode
 
-		bits	32
+;		bits	32
 
-pmode:
+		bits	64
+
+longmode:
 		
 		mov		ax, 0x10
 		mov		ds, ax
@@ -342,7 +434,7 @@ pmode:
 		mov		ss, ax
 		mov		esp, 0x90000
 
-		mov		esi, 0x20000
+		mov		esi, FILE_ADDRESS
 
 		xor		ecx, ecx
 
@@ -352,7 +444,7 @@ pmode:
 		; Program entry address
 		mov		eax, [esi+0x18]
 
-		push	eax
+		push	rax
 
 		; Start of program header table
 		mov		edx, [esi+0x20]
@@ -366,7 +458,7 @@ pmode:
 		mov		[ELFSectionHeaderEntries], cx
 
 		; Set esi to start of program header table
-		mov		esi, 0x20000
+		mov		esi, FILE_ADDRESS
 		mov		ebx, esi
 		add		esi, edx
 
@@ -392,10 +484,10 @@ pmode:
 		mov		ecx, [esi+0x20]
 
 .copyProgramHeader:
-		push	esi
+		push	rsi
 		mov		esi, ebx
 		rep		movsb
-		pop		esi
+		pop		rsi
 
 		mov		cx, word [ELFProgramHeaderEntries] 
 
@@ -418,34 +510,45 @@ pmode:
 		mov		bx, BIOSParamBlock
 		mov		dl, byte [driveNumber]
 
-		pop		eax
+		pop		rax
 
-		jmp		eax
+		jmp		rax
 
 		
 		jmp		$
 
 
+		ALIGN 4
+
+idt:
+.Length:	dw	0
+.Base:		dd	0
+
+		ALIGN 4
+
 gdtData:
 		; Null descriptor
-		dd		0
-		dd		0
+;		dd		0
+;		dd		0
+		dq		0
 
 		; Kernel code descriptor
-		dw		0xFFFF
-		dw		0
-		db		0
-		db		0x9A
-		db		0xCF
-		db		0
+		dq		0x00209A0000000000
+;		dw		0xFFFF
+;		dw		0
+;		db		0
+;		db		0x9A
+;		db		0xCF
+;		db		0
 
 		; Kernel data descriptor
-		dw		0xFFFF
-		dw		0
-		db		0
-		db		0x92
-		db		0xCF
-		db		0
+		dq		0x0000920000000000
+;		dw		0xFFFF
+;		dw		0
+;		db		0
+;		db		0x92
+;		db		0xCF
+;		db		0
 
 endGdtData:
 
