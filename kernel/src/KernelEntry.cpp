@@ -25,7 +25,7 @@ enum class ConsoleColor
     White,
 };
 
-#define MAKE_COLOR(background, foreground) (((uint8_t)background & 0xF) << 4 + ((uint8_t)foreground & 0xF))
+#define MAKE_COLOR(background, foreground) (uint8_t)((((uint8_t)background & 0xF) << 4) | ((uint8_t)foreground & 0xF))
 
 struct Console
 {
@@ -47,7 +47,7 @@ void PrintString(Console* console, const char* string)
     while (*string != 0)
     {
 //        address[location++] = (uint16_t)(MAKE_COLOR(ConsoleColor::LightRed, ConsoleColor::Black) << 8) + *string++;
-        console->BaseAddress[console->CursorLocation++] = (uint16_t)(MAKE_COLOR(ConsoleColor::LightRed, ConsoleColor::Black) << 8) + *string++;
+        console->BaseAddress[console->CursorLocation++] = (uint16_t)(MAKE_COLOR(ConsoleColor::LightGray, ConsoleColor::Magenta) << 8) + *string++;
     }
 }
 
@@ -60,7 +60,10 @@ void ClearScreen()
     {
         for (unsigned int x = 0; x < 80; x++)
         {
-            videoMemory[y * 80 + x] = 0x209F;
+//            videoMemory[y * 80 + x] = 0x1F20; 
+            uint16_t value = (uint16_t)((0x1F) << 8) + 'A';
+            videoMemory[y * 80 + x] = value;
+            videoMemory[y * 80 + x] = (uint16_t)((MAKE_COLOR(ConsoleColor::Red, ConsoleColor::LightBlue) << 8) + 0x20);
         }
     }
 }
