@@ -1,5 +1,7 @@
 #include "include/types.h"
 
+#include "include/io.h"
+
 
 extern "C"
 {
@@ -70,6 +72,9 @@ void ClearScreen()
 
 int _kernel_entry()
 {
+    uint8_t value = Inport(0x64);
+    Outport(0x64, 0xF0);
+
     Console console = {};
     console.BaseAddress = (uint16_t*)0xB8000;
 

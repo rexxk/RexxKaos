@@ -16,6 +16,7 @@ project "kernel"
 
 	links
 	{
+--		"../bin/*.o",
 --		"bin/entry",
 	}
 
@@ -29,4 +30,4 @@ project "kernel"
 		targetdir "../bin"
 		targetname "kernel.sys"
 		buildoptions { "-ffreestanding" }
-		linkoptions { "-nostdlib -z noexecstack -Tlink.ld ../bin/entry.o" }
+		linkoptions { "-nostdlib -z noexecstack -Tlink.ld ../bin/*.o" }
