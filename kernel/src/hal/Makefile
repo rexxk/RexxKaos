@@ -4,11 +4,13 @@ AS=nasm
 
 BUILD_DIR= build
 ASFLAGS= -f elf64
-ASMSOURCES = $(shell find -name '*.asm')
+ASMSOURCES = $(wildcard *.asm)
 ASMOBJECTS = $(patsubst %.asm, %.o, $(ASMSOURCES))
 
-$(ASMOBJECTS): %.o : $(ASMSOURCES)
-	$(AS) $(ASFLAGS) $< -o $@
+all: $(ASMOBJECTS)
+
+%.o: %.asm
+	$(AS) $(ASFLAGS) $<
 
 clean:
 	rm -f *.o

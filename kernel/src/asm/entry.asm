@@ -35,4 +35,5 @@ _start:
 driveNumber:        db      0
 bootMessage:        db      "Loading RexxKaos, a very simple operating system", 13, 10, 0
 
+        global bootDataAddress
 bootDataAddress:        dq      0

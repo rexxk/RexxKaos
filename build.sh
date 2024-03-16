@@ -1,4 +1,4 @@
-make clean
+#make clean
 
 mkdir bin
 
