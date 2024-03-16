@@ -10,6 +10,8 @@
 
 %define PAGE_MAP_ADDRESS	0x1000
 
+%define DATA_STRUCT_ADDRESS	0x0500
+
 %define PAGE_PRESENT	(1 << 0)
 %define PAGE_WRITE		(1 << 1)
 
@@ -306,7 +308,6 @@ msgProgress:	db  ".", 0
 msgFileNotFound: db "File not found", CRLF, 0
 
 loaderFilename:	db	"KERNEL  SYS"
-;loaderFilename:	db	"HELLO   TXT"
 
 sector:			db	0
 head:			db	0
@@ -325,6 +326,36 @@ times 510-($-$$)	db	0
 stage2:
 
 		call	EnableA20
+
+; Get memory maps
+		int		0x12
+
+		mov		word [MemoryData.LowMemory], ax
+
+		xor		ax, ax
+		mov		es, ax
+
+		mov		di, MemoryData.HighMemAddress
+		xor		ebx, ebx
+		xor		si, si
+
+.getNextMemoryBlock:
+		mov		edx, 0x534D4150
+		mov		eax, 0xE820
+		mov		ecx, 24
+
+		int		0x15
+
+		cmp		ebx, 0x0
+		je		.readMemoryBlocksDone
+
+		add		di, cx
+		inc		si
+
+		jmp		.getNextMemoryBlock
+
+.readMemoryBlocksDone:
+		mov		word [MemoryData.EntryCount], si
 
 ; Entring 64-bit longmode
 		xor		ax, ax
@@ -413,13 +444,7 @@ stage2:
 
 		lgdt	[gdtStruct]
 
-;		mov		eax, cr0
-;		or		eax, 1
-;		mov		cr0, eax
-
 		jmp		0x08:longmode
-
-;		bits	32
 
 		bits	64
 
@@ -507,10 +532,12 @@ longmode:
 
 
 .jump32bit:
-		mov		bx, BIOSParamBlock
-		mov		dl, byte [driveNumber]
 
 		pop		rax
+
+		push	rbx
+		push	DATA_STRUCT_ADDRESS
+		push	rdx
 
 		jmp		rax
 
@@ -527,28 +554,13 @@ idt:
 		ALIGN 4
 
 gdtData:
-		; Null descriptor
-;		dd		0
-;		dd		0
 		dq		0
 
 		; Kernel code descriptor
 		dq		0x00209A0000000000
-;		dw		0xFFFF
-;		dw		0
-;		db		0
-;		db		0x9A
-;		db		0xCF
-;		db		0
 
 		; Kernel data descriptor
 		dq		0x0000920000000000
-;		dw		0xFFFF
-;		dw		0
-;		db		0
-;		db		0x92
-;		db		0xCF
-;		db		0
 
 endGdtData:
 
@@ -559,3 +571,9 @@ gdtStruct:
 
 ELFProgramHeaderEntries:	dw		0
 ELFSectionHeaderEntries:	dw		0
+
+
+MemoryData:
+.LowMemory:			dw		0
+.EntryCount:		dw		0
+.HighMemAddress:	dq		0

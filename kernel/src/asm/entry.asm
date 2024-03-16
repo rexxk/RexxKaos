@@ -6,6 +6,9 @@
 
         global _entry
 _entry:
+        pop	rdx
+        pop	rcx
+        pop	rbx
 
         jmp     _start
 
@@ -14,6 +17,7 @@ _entry:
 
 _start:
         mov     byte [driveNumber], dl
+        mov     qword [bootDataAddress], rcx
 
         call     _kernel_entry
         
@@ -30,3 +34,5 @@ _start:
 
 driveNumber:        db      0
 bootMessage:        db      "Loading RexxKaos, a very simple operating system", 13, 10, 0
+
+bootDataAddress:        dq      0
