@@ -11,6 +11,20 @@ extern "C" void _SetMemory(void* destination, uint64_t value, uint64_t count);
 static MemoryInformation* s_MemoryInformation = nullptr;
 
 
+const char* MemoryRegionTypeToString(MemoryRegionType type)
+{
+    switch (type)
+    {
+        case MemoryRegionType::Usable: return "Usable";
+        case MemoryRegionType::Reserved: return "Reserved";
+        case MemoryRegionType::ACPIReclaimable: return "ACPI Reclaimable";
+        case MemoryRegionType::ACPINVS: return "ACPI NVS";
+        case MemoryRegionType::Bad: return "Bad";
+    }
+
+    return "Unknown region type";
+}
+
 
 MemoryInformation* GetMemoryInformation()
 {
@@ -27,7 +41,7 @@ MemoryInformation* GetMemoryInformation()
         _RawMemoryRegion* region = (_RawMemoryRegion*)&s_MemoryInformation->MemoryRegions + ((i * s_MemoryInformation->EntrySize) / sizeof(_RawMemoryRegion));
 
 
-        PrintString("  + %x : (%x bytes) [%d]\n", region->BaseAddress, region->Length, region->RegionType);
+        PrintString("  + %x : (%x bytes) [%s]\n", region->BaseAddress, region->Length, MemoryRegionTypeToString((MemoryRegionType)region->RegionType));
 
     }
 

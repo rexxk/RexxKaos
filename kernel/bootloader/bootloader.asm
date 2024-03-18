@@ -356,6 +356,7 @@ stage2:
 
 .readMemoryBlocksDone:
 		mov		word [MemoryData.EntryCount], si
+		mov		word [MemoryData.EntrySize], cx
 
 ; Entring 64-bit longmode
 		xor		ax, ax
@@ -536,7 +537,7 @@ longmode:
 		pop		rax
 
 		push	rbx
-		push	DATA_STRUCT_ADDRESS
+		push	MemoryData
 		push	rdx
 
 		jmp		rax
@@ -576,4 +577,5 @@ ELFSectionHeaderEntries:	dw		0
 MemoryData:
 .LowMemory:			dw		0
 .EntryCount:		dw		0
+.EntrySize:			dw		0
 .HighMemAddress:	dq		0
