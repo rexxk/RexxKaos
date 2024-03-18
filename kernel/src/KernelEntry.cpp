@@ -10,6 +10,27 @@ extern "C"
 {
 
 
+class Test
+{
+public:
+    Test()
+    {
+        PrintString("Class: Test\n");
+    }
+
+    virtual ~Test() {}
+};
+
+class InheritedTest : public Test
+{
+public:
+    InheritedTest()
+    {
+        PrintString("Class: InheritedTest\n");
+    }
+
+    virtual ~InheritedTest() {}
+};
 
 
 int _kernel_entry()
@@ -24,6 +45,9 @@ int _kernel_entry()
     PrintString("5 * 7 + 2 = %d\n", 5 * 7 + 2);
 
     PrintString("Console address: %x\n", 0x80085deadbeef717); // 0xB8000);
+
+    Test testClass;
+    InheritedTest inheritedTestClass;
 
     return 0;
 }

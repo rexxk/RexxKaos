@@ -29,5 +29,5 @@ project "kernel"
 	filter "system:linux"
 		targetdir "../bin"
 		targetname "kernel.sys"
-		buildoptions { "-ffreestanding" }
+		buildoptions { "-ffreestanding -fno-rtti -fno-exceptions -fcheck-new" }
 		linkoptions { "-nostdlib -z noexecstack -Tlink.ld ../bin/*.o" }

@@ -1,5 +1,6 @@
 #include "include/cxx_abi.h"
 
+#include "include/types.h"
 
 // Default empty pure virtual function
 
@@ -12,6 +13,20 @@ void __cxa_pure_virtual()
 
 }
 
+void* operator new(size_t size)
+{
+    return nullptr;
+}
+
+void operator delete(void* ptr)
+{
+
+}
+
+void operator delete(void* ptr, unsigned long)
+{
+    
+}
 
 atexit_func_entry_t __atexit_funcs[AtExitMaxFunctions];
 uarch_t __atexit_func_count = 0;
@@ -56,5 +71,33 @@ void __cxa_finalize(void *fn)
     }
 }
 
+
+}
+
+
+namespace __cxxabiv1
+{
+
+    __extension__ typedef int __guard __attribute__((mode(__DI__)));
+
+extern "C"
+{
+
+    int __cxa_guard_acquire(__guard* guard)
+    {
+        return !*(char *)(guard);
+    }
+
+    void __cxa_guard_release(__guard* guard)
+    {
+        *(char*)guard = 1;
+    }
+
+    void __cxa_guard_abort(__guard* guard)
+    {
+
+    }
+
+}
 
 }
