@@ -1,5 +1,5 @@
-#include "include/memory.h"
-#include "include/console.h"
+#include "memory.h"
+#include "console.h"
 
 
 extern uint64_t bootDataAddress;

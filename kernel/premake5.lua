@@ -5,7 +5,7 @@ project "kernel"
 
 	includedirs
 	{
-		"%{prj.location}/src",
+		"%{prj.location}/src/include",
 	}
 	
 	files
