@@ -1,5 +1,5 @@
-#include "memory.h"
-#include "console.h"
+#include "memory/memory.h"
+#include "console/console.h"
 
 
 extern uint64_t bootDataAddress;
@@ -34,15 +34,13 @@ MemoryInformation* GetMemoryInformation()
 
     PrintString(" - entry count: %d\n", s_MemoryInformation->EntryCount);
     PrintString(" - entry size: %d\n", s_MemoryInformation->EntrySize);
-    PrintString(" - region start: %x\n", &s_MemoryInformation->MemoryRegions);
+    PrintString(" - region start: %x\n", &s_MemoryInformation->MemoryRegionPointer);
 
     for (uint16_t i = 0; i < s_MemoryInformation->EntryCount; i++)
     {
-        _RawMemoryRegion* region = (_RawMemoryRegion*)&s_MemoryInformation->MemoryRegions + ((i * s_MemoryInformation->EntrySize) / sizeof(_RawMemoryRegion));
-
+        MemoryRegion* region = (MemoryRegion*)&s_MemoryInformation->MemoryRegionPointer + ((i * s_MemoryInformation->EntrySize) / sizeof(MemoryRegion));
 
         PrintString("  + %x : (%x bytes) [%s]\n", region->BaseAddress, region->Length, MemoryRegionTypeToString((MemoryRegionType)region->RegionType));
-
     }
 
     return s_MemoryInformation;

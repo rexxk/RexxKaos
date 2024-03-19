@@ -1,9 +1,9 @@
-#include "console.h"
+#include "console/console.h"
 
-#include "io.h"
-#include "string.h"
+#include "io/io.h"
 
-#include "va_list.h"
+#include "core/string.h"
+#include "core/va_list.h"
 
 
 static constexpr uint16_t ConsoleWidth = 80;

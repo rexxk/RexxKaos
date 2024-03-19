@@ -1,9 +1,9 @@
-#include "types.h"
+#include "core/types.h"
 
-#include "io.h"
+#include "io/io.h"
 
-#include "console.h"
-#include "memory.h"
+#include "console/console.h"
+#include "memory/memory.h"
 
 
 extern "C"
