@@ -14,3 +14,5 @@ typedef unsigned long long uint64_t;
 typedef unsigned uarch_t;
 
 typedef long unsigned int size_t;
+
+typedef long int ptrdiff_t;

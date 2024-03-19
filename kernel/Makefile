@@ -21,15 +21,15 @@ endif
 RESCOMP = windres
 TARGETDIR = ../bin
 TARGET = $(TARGETDIR)/kernel.sys
-INCLUDES += -Isrc
+INCLUDES += -Isrc/include
 FORCE_INCLUDE +=
 ALL_CPPFLAGS += $(CPPFLAGS) -MD -MP $(DEFINES) $(INCLUDES)
-ALL_CFLAGS += $(CFLAGS) $(ALL_CPPFLAGS) -m64 -ffreestanding
-ALL_CXXFLAGS += $(CXXFLAGS) $(ALL_CPPFLAGS) -m64 -ffreestanding
+ALL_CFLAGS += $(CFLAGS) $(ALL_CPPFLAGS) -m64 -ffreestanding -fno-rtti -fno-exceptions -fcheck-new
+ALL_CXXFLAGS += $(CXXFLAGS) $(ALL_CPPFLAGS) -m64 -ffreestanding -fno-rtti -fno-exceptions -fcheck-new
 ALL_RESFLAGS += $(RESFLAGS) $(DEFINES) $(INCLUDES)
 LIBS +=
 LDDEPS +=
-ALL_LDFLAGS += $(LDFLAGS) -L/usr/lib64 -m64 -s -nostdlib -z noexecstack -Tlink.ld ../bin/entry.o
+ALL_LDFLAGS += $(LDFLAGS) -L/usr/lib64 -m64 -s -nostdlib -z noexecstack -Tlink.ld ../bin/*.o
 LINKCMD = $(CC) -o "$@" $(OBJECTS) $(RESOURCES) $(ALL_LDFLAGS) $(LIBS)
 define PREBUILDCMDS
 endef
@@ -59,7 +59,17 @@ GENERATED :=
 OBJECTS :=
 
 GENERATED += $(OBJDIR)/KernelEntry.o
+GENERATED += $(OBJDIR)/console.o
+GENERATED += $(OBJDIR)/cxx_abi.o
+GENERATED += $(OBJDIR)/io.o
+GENERATED += $(OBJDIR)/memory.o
+GENERATED += $(OBJDIR)/string.o
 OBJECTS += $(OBJDIR)/KernelEntry.o
+OBJECTS += $(OBJDIR)/console.o
+OBJECTS += $(OBJDIR)/cxx_abi.o
+OBJECTS += $(OBJDIR)/io.o
+OBJECTS += $(OBJDIR)/memory.o
+OBJECTS += $(OBJDIR)/string.o
 
 # Rules
 # #############################################
@@ -124,6 +134,21 @@ endif
 # #############################################
 
 $(OBJDIR)/KernelEntry.o: src/KernelEntry.cpp
+	@echo "$(notdir $<)"
+	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
+$(OBJDIR)/console.o: src/console.cpp
+	@echo "$(notdir $<)"
+	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
+$(OBJDIR)/cxx_abi.o: src/cxx_abi.cpp
+	@echo "$(notdir $<)"
+	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
+$(OBJDIR)/io.o: src/io.cpp
+	@echo "$(notdir $<)"
+	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
+$(OBJDIR)/memory.o: src/memory.cpp
+	@echo "$(notdir $<)"
+	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
+$(OBJDIR)/string.o: src/string.cpp
 	@echo "$(notdir $<)"
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 

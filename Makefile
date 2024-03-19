@@ -10,21 +10,27 @@ endif
 
 ifeq ($(config),debug_win64)
   DiskEMU_config = debug_win64
+  Debugger_config = debug_win64
+  kernel_config = debug_win64
 
 else ifeq ($(config),release_win64)
   DiskEMU_config = release_win64
+  Debugger_config = release_win64
+  kernel_config = release_win64
 
 else
   $(error "invalid configuration $(config)")
 endif
 
-PROJECTS := DiskEMU
+PROJECTS := DiskEMU Debugger kernel
 
-.PHONY: all clean help $(PROJECTS) Tools
+.PHONY: all clean help $(PROJECTS) Kernel Tools
 
 all: $(PROJECTS)
 
-Tools: DiskEMU
+Kernel: kernel
+
+Tools: Debugger DiskEMU
 
 DiskEMU:
 ifneq (,$(DiskEMU_config))
@@ -32,8 +38,22 @@ ifneq (,$(DiskEMU_config))
 	@${MAKE} --no-print-directory -C tools/diskemu -f Makefile config=$(DiskEMU_config)
 endif
 
+Debugger:
+ifneq (,$(Debugger_config))
+	@echo "==== Building Debugger ($(Debugger_config)) ===="
+	@${MAKE} --no-print-directory -C tools/debugger -f Makefile config=$(Debugger_config)
+endif
+
+kernel:
+ifneq (,$(kernel_config))
+	@echo "==== Building kernel ($(kernel_config)) ===="
+	@${MAKE} --no-print-directory -C kernel -f Makefile config=$(kernel_config)
+endif
+
 clean:
 	@${MAKE} --no-print-directory -C tools/diskemu -f Makefile clean
+	@${MAKE} --no-print-directory -C tools/debugger -f Makefile clean
+	@${MAKE} --no-print-directory -C kernel -f Makefile clean
 
 help:
 	@echo "Usage: make [config=name] [target]"
@@ -46,5 +66,7 @@ help:
 	@echo "   all (default)"
 	@echo "   clean"
 	@echo "   DiskEMU"
+	@echo "   Debugger"
+	@echo "   kernel"
 	@echo ""
 	@echo "For more information, see https://github.com/premake/premake-core/wiki"

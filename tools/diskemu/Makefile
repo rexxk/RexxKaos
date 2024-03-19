@@ -60,13 +60,17 @@ endif
 GENERATED :=
 OBJECTS :=
 
+GENERATED += $(OBJDIR)/StringTools.o
 GENERATED += $(OBJDIR)/disk.o
 GENERATED += $(OBJDIR)/fat12.o
 GENERATED += $(OBJDIR)/filesystem.o
+GENERATED += $(OBJDIR)/jsonparser.o
 GENERATED += $(OBJDIR)/main.o
+OBJECTS += $(OBJDIR)/StringTools.o
 OBJECTS += $(OBJDIR)/disk.o
 OBJECTS += $(OBJDIR)/fat12.o
 OBJECTS += $(OBJDIR)/filesystem.o
+OBJECTS += $(OBJDIR)/jsonparser.o
 OBJECTS += $(OBJDIR)/main.o
 
 # Rules
@@ -137,10 +141,16 @@ $(OBJDIR)/fat12.o: src/fs/fat12.cpp
 $(OBJDIR)/filesystem.o: src/fs/filesystem.cpp
 	@echo "$(notdir $<)"
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
+$(OBJDIR)/jsonparser.o: src/json/jsonparser.cpp
+	@echo "$(notdir $<)"
+	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 $(OBJDIR)/main.o: src/main.cpp
 	@echo "$(notdir $<)"
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 $(OBJDIR)/disk.o: src/media/disk.cpp
+	@echo "$(notdir $<)"
+	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
+$(OBJDIR)/StringTools.o: src/utils/StringTools.cpp
 	@echo "$(notdir $<)"
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 

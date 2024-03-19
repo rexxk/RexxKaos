@@ -11,16 +11,16 @@ Output file:  bootloader.bin
 -- Sections (summary) ---------------------------------------------------------
 
 Vstart            Start             Stop              Length    Class     Name
-            7C00              7C00              7EC1  000002C1  progbits  .text
+            7C00              7C00              7FF0  000003F0  progbits  .text
 
 -- Sections (detailed) --------------------------------------------------------
 
 ---- Section .text ------------------------------------------------------------
 
 class:     progbits
-length:                 2C1
+length:                 3F0
 start:                 7C00
-align:     not defined
+align:                    4
 follows:   not defined
 vstart:                7C00
 valign:    not defined
@@ -81,12 +81,31 @@ Real              Virtual           Name
             7E32              7E32  A20Wait
             7E39              7E39  A20Wait2
             7E40              7E40  stage2
-            7E57              7E57  pmode
-            7E6F              7E6F  pmode.parseElfImage
-            7E8C              7E8C  pmode.copyElf
-            7E90              7E90  pmode.doneCopyElf
-            7E90              7E90  pmode.jump32bit
-            7EA3              7EA3  gdtData
-            7EBB              7EBB  endGdtData
-            7EBB              7EBB  gdtStruct
+            7E54              7E54  stage2.getNextMemoryBlock
+            7E73              7E73  stage2.readMemoryBlocksDone
+            7E85              7E85  stage2.clearPageMap
+            7E94              7E94  stage2.buildPML
+            7EA2              7EA2  stage2.buildPDPT
+            7EB2              7EB2  stage2.buildPD
+            7ECD              7ECD  stage2.loopPageTable
+            7F26              7F26  longmode
+            7F40              7F40  longmode.parseElfImage
+            7F74              7F74  longmode.readProgramHeader
+            7F90              7F90  longmode.copyProgramHeader
+            7FA0              7FA0  longmode.programHeaderDone
+            7FAC              7FAC  longmode.doneCopyElf
+            7FAC              7FAC  longmode.jump32bit
+            7FB8              7FB8  idt
+            7FB8              7FB8  idt.Length
+            7FBA              7FBA  idt.Base
+            7FC0              7FC0  gdtData
+            7FD8              7FD8  endGdtData
+            7FD8              7FD8  gdtStruct
+            7FDE              7FDE  ELFProgramHeaderEntries
+            7FE0              7FE0  ELFSectionHeaderEntries
+            7FE2              7FE2  MemoryData
+            7FE2              7FE2  MemoryData.LowMemory
+            7FE4              7FE4  MemoryData.EntryCount
+            7FE6              7FE6  MemoryData.EntrySize
+            7FE8              7FE8  MemoryData.HighMemAddress
 
