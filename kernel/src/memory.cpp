@@ -61,7 +61,7 @@ const MemoryInformation& GetMemoryInformation()
         }
     }
 
-    PrintString("Total amount of memory: %d kBytes", s_MemoryInformation.TotalMemorySize / 1024);
+    PrintString("Total amount of memory: %d kBytes\n", s_MemoryInformation.TotalMemorySize / 1024);
 
     return s_MemoryInformation;
 }

@@ -13,11 +13,11 @@ enum class MemoryRegionType : uint32_t
 };
 
 
-struct __attribute__((packed)) MemoryRegion
+struct MemoryRegion
 {
     uint64_t BaseAddress;
     uint64_t Length;
     MemoryRegionType RegionType;
 
-};
+} __attribute__((packed));
 

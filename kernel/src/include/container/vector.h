@@ -16,6 +16,7 @@ public:
 
     }
 
+    void* Data() { return &m_Data; }
     uint64_t Size() const { return m_Size; }
 
     void PushBack(T& value)

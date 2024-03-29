@@ -10,7 +10,7 @@ const char* IntegerToString(char* buffer, uint32_t value, uint8_t base)
     {
         buffer[0] = '0';
         buffer[1] = 0;
-        
+
         return buffer;
     }
 
