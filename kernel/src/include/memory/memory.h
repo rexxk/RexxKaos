@@ -5,7 +5,7 @@
 
 
 
-struct __attribute__((packed)) MemoryInformation
+struct __attribute__((packed)) BIOSMemoryInformation
 {
     uint16_t LowMemory;
     uint16_t EntryCount;
@@ -15,8 +15,15 @@ struct __attribute__((packed)) MemoryInformation
 };
 
 
+struct MemoryInformation
+{
+    uint64_t TotalMemorySize;
+    uint64_t UsedMemorySize;
+    uint32_t MemoryPageSize;
+};
 
-MemoryInformation* GetMemoryInformation();
+
+const MemoryInformation& GetMemoryInformation();
 
 
 void CopyMemory(void* destination, void* source, uint64_t length);

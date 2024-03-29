@@ -6,6 +6,14 @@ const char* IntegerToString(char* buffer, uint32_t value, uint8_t base)
 {
     char tempBuffer[32] = {0};
 
+    if (value == 0)
+    {
+        buffer[0] = '0';
+        buffer[1] = 0;
+        
+        return buffer;
+    }
+
     uint32_t position = 0;
 
     while (value != 0)

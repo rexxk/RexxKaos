@@ -8,7 +8,7 @@
 template<typename T>
 class FirmVector
 {
-    static constexpr uint64_t MaxSize = 50; 
+    static constexpr uint64_t MaxSize = 256; 
 
 public:
     FirmVector()
