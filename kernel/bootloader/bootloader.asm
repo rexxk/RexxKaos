@@ -14,6 +14,7 @@
 
 %define PAGE_PRESENT	(1 << 0)
 %define PAGE_WRITE		(1 << 1)
+%define PAGE_2MB		(1 << 7)
 
 entry:
 		jmp short start
@@ -388,24 +389,23 @@ stage2:
 		mov		[es:di + 0x1000], eax
 
 		; Build Page Directory
+		; 2 MB page size is used
+		
 .buildPD:
-		; Address to Page Table into eax
-		lea		eax, [es:di + 0x3000]
-		or		eax, PAGE_PRESENT | PAGE_WRITE
-		mov		[es:di + 0x2000], eax
-
+		; Address to Page Directory Entry into eax
 		push	di
-		; Point to page table
-		lea		di, [di + 0x3000]
-		mov		eax, PAGE_PRESENT | PAGE_WRITE
+		; Point to page directory entry
+		lea		di, [di + 0x2000]
+		mov		eax, PAGE_PRESENT | PAGE_WRITE | PAGE_2MB
 
 		; Build the page table
-.loopPageTable:
+.loopPageDirectoryEntry:
 		mov		[es:di], eax
-		add		eax, 0x1000
+		add		eax, 0x200000
+
 		add		di, 8
-		cmp		eax, 0x200000
-		jb		.loopPageTable
+		cmp		eax, 0x600000
+		jb		.loopPageDirectoryEntry
 
 		pop		di
 
