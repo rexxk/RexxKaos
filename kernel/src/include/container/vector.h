@@ -2,7 +2,7 @@
 
 #include "core/types.h"
 
- 
+#include "console/console.h" 
 
 
 template<typename T>
@@ -12,9 +12,16 @@ class FirmVector
 
 public:
     FirmVector()
+        : m_Size(FirmVector::MaxSize)
     {
-
+        PrintString("FirmVector maxSize = %d\n", m_Size);
     }
+
+    void SetSize()
+    {
+        m_Size = FirmVector::MaxSize;
+    }
+
 
     void* Data() { return &m_Data; }
     uint64_t Size() const { return m_Size; }

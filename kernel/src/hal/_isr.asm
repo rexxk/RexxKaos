@@ -13,6 +13,8 @@ isr_stub_%+%1:
 
 %macro isr_no_err_stub 1
 isr_stub_%+%1:
+        cli
+        hlt
         call ExceptionHandler
         iretq
 %endmacro
@@ -68,5 +70,7 @@ isr_stub_table:
 
 isr0:
         cli
+        hlt
+
         call DivideByZeroException
         iretq
