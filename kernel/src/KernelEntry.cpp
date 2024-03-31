@@ -4,6 +4,7 @@
 
 #include "console/console.h"
 #include "memory/memory.h"
+#include "memory/PhysicalMemory.h"
 
 #include "interrupt/interrupt.h"
 
@@ -19,12 +20,15 @@ int _kernel_entry()
     ClearScreen();
     PrintString("RexxKaos operating system.\nSupported features: NONE\n", 0x10);
 
-    GetMemoryInformation();
+    MemoryInformation memoryInformation = GetMemoryInformation();
 
     InitIDT();
 
+    PhysicalMemory physicalMemory(memoryInformation.TotalMemorySize);
+
+
 //    uint8_t* highPage = (uint8_t*)0x400020;
-    uint8_t* highPage = (uint8_t*)0x5FFFF0;
+    uint8_t* highPage = (uint8_t*)0x1FFFFF0;
     highPage[0] = 0x13;
 
 //    float divideByZero = 15 / 0;

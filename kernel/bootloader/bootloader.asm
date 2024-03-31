@@ -390,7 +390,7 @@ stage2:
 
 		; Build Page Directory
 		; 2 MB page size is used
-		
+
 .buildPD:
 		; Address to Page Directory Entry into eax
 		push	di
@@ -404,7 +404,7 @@ stage2:
 		add		eax, 0x200000
 
 		add		di, 8
-		cmp		eax, 0x600000
+		cmp		eax, 0x200000F			; Added 0xF to compensate for flags byte
 		jb		.loopPageDirectoryEntry
 
 		pop		di
