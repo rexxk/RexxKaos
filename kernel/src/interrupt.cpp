@@ -16,6 +16,9 @@ extern "C" void _EnableInterrupts();
 extern "C" void _DisableInterrupts();
 
 extern "C" void isr0();
+extern "C" void isr8();
+extern "C" void isr13();
+extern "C" void isr14();
 
 extern "C" void ExceptionHandler()
 {
@@ -28,6 +31,22 @@ extern void* isr_stub_table[];
 extern "C" void DivideByZeroException()
 {
     PrintString("Divide by zero\n");
+}
+
+
+extern "C" void DoubleFaultException()
+{
+    PrintString("Double fault\n");
+}
+
+extern "C" void GeneralProtectionFaultException()
+{
+    PrintString("General protection fault\n");
+}
+
+extern "C" void PageFaultException(uint64_t address)
+{
+    PrintString("Page fault: %x\n", address);
 }
 
 void EnableInterrupts()
@@ -53,6 +72,9 @@ void InitIDT()
     }
 
     SetInterruptGate(0, (uint64_t)&isr0);
+    SetInterruptGate(8, (uint64_t)&isr8);
+    SetInterruptGate(13, (uint64_t)&isr13);
+    SetInterruptGate(14, (uint64_t)&isr14);
 
     PrintString("IDTR address: %x\n", (uint64_t)&s_IDTR);
 

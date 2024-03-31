@@ -5,7 +5,7 @@
 %macro isr_err_stub 1
 isr_stub_%+%1:
         cli
-        hlt
+
         call ExceptionHandler
         mov     rax, 0
         iretq
@@ -14,7 +14,7 @@ isr_stub_%+%1:
 %macro isr_no_err_stub 1
 isr_stub_%+%1:
         cli
-        hlt
+
         call ExceptionHandler
         iretq
 %endmacro
@@ -69,8 +69,41 @@ isr_stub_table:
         global isr0
 
 isr0:
-        cli
-        hlt
 
         call DivideByZeroException
+
+        jmp     $
+
         iretq
+
+        extern DoubleFaultException
+        global isr8
+
+isr8:
+        call DoubleFaultException
+
+        iretq
+
+
+        extern GeneralProtectionFaultException
+        global isr13
+
+isr13:
+        call GeneralProtectionFaultException
+
+        iretq
+
+
+        extern PageFaultException
+        global isr14
+
+isr14:
+        cli
+
+        mov     rdi, rax
+        call PageFaultException
+
+        jmp     $
+
+        iretq
+

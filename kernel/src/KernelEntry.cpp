@@ -23,7 +23,10 @@ int _kernel_entry()
 
     InitIDT();
 
-    float divideByZero = 15 / 0;
+    uint8_t* highPage = (uint8_t*)0x400020;
+    highPage[0] = 0x13;
+
+//    float divideByZero = 15 / 0;
 
 
     return 0;
